@@ -1,5 +1,5 @@
 #include <hge.h>
-#include "ant.h"
+#include "entity/ant.h"
 Ant::Ant()
 {
     pos.x = 0;
@@ -7,7 +7,11 @@ Ant::Ant()
     angle = 0;
     hp = 100;
     level = 1;
+
+
+    anim.setAnimData(, cAni::0);
 }
+
 void Ant::render(int time)
 {
     HGE* hge = hgeCreate(HGE_VERSION);

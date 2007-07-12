@@ -4,12 +4,17 @@
 #include <hgevector.h>
 #include "caAnimation.h"
 
+/* @class Ant
+ * @note ant
+ */
+
 class Ant
 {
 public:
     Ant();
     virtual void render(int time);
     virtual void step();
+protected:
     int hp;
     int level;
 

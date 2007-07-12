@@ -1,4 +1,4 @@
-#include "bullet.h"
+#include "entity/bullet.h"
 
 void Bullet::render(int time)
 {

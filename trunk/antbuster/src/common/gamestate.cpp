@@ -1,5 +1,5 @@
 
-#include "gamestate.h"
+#include "common/gamestate.h"
 
 #include <cassert>
 
@@ -21,7 +21,6 @@ void GameState::SetName(const string &name)
 
 GameStateManager *GameStateManager::sInstance = 0;
 
-
 GameStateManager *GameStateManager::Instance()
 {
     if (sInstance == 0)
@@ -30,6 +29,16 @@ GameStateManager *GameStateManager::Instance()
     }
     return sInstance;
 }
+
+void GameStateManager::ReleaseInstance()
+{
+    if (sInstance)
+    {
+        delete sInstance;
+        sInstance = 0;
+    }
+}
+
 GameStateManager::GameStateManager() : curState(0)
 {
     HGE *hge = hgeCreate(HGE_VERSION);
@@ -40,6 +49,11 @@ GameStateManager::GameStateManager() : curState(0)
 }
 GameStateManager::~GameStateManager()
 {
+    if (curState)
+    {
+        curState->OnLeave();
+        curState = 0;
+    }
 }
 
 GameState *GameStateManager::FindState(const string &name) const
@@ -51,6 +65,7 @@ GameState *GameStateManager::FindState(const string &name) const
     }
     return 0;
 }
+
 void GameStateManager::RegisterState(GameState *state)
 {
     assert(state);
@@ -84,12 +99,12 @@ bool GameStateManager::OnFrame()
     return false;
 }
 
-bool FrameFunc()
+static bool FrameFunc()
 {
     return GameStateManager::Instance()->OnFrame();
 }
 
-bool RenderFunc()
+static bool RenderFunc()
 {
     GameState *gs = GameStateManager::Instance()->curState;
     if (gs)

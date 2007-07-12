@@ -1,7 +1,7 @@
 #ifndef MAINMENUSTATE_H
 #define MAINMENUSTATE_H
 
-#include "gamestate.h"
+#include "common/gamestate.h"
 
 #include <hge.h>
 class hgeSprite;
