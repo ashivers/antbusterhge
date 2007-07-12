@@ -1,11 +1,12 @@
-#include "hgeSprite.h"
-#include "hgefont.h"
-#include "hgegui.h"
-#include "menuitem.h"
 #include <cassert>
 #include <cmath>
 
-#include "mainmenustate.h"
+#include "hgeSprite.h"
+#include "hgefont.h"
+#include "hgegui.h"
+
+#include "common/menuitem.h"
+#include "menu/mainmenustate.h"
 
 void MainMenuState::OnEnter()
 {

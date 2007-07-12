@@ -33,20 +33,20 @@ public:
 	virtual			~hgeGUIObject() { hge->Release(); }
 
 	virtual void	Render() = 0;
-	virtual void	Update(float dt) {}
+	virtual void	Update(float dt) { dt; }
 
 	virtual void	Enter() {}
 	virtual void	Leave() {}
 	virtual void	Reset() {}
 	virtual bool	IsDone() { return true; }
-	virtual void	Focus(bool bFocused) {}
-	virtual void	MouseOver(bool bOver) {}
+	virtual void	Focus(bool bFocused) { bFocused; }
+	virtual void	MouseOver(bool bOver) { bOver; }
 
-	virtual bool	MouseMove(float x, float y) { return false; }
-	virtual bool	MouseLButton(bool bDown) { return false; }
-	virtual bool	MouseRButton(bool bDown) { return false; }
-	virtual bool	MouseWheel(int nNotches) { return false; }
-	virtual bool	KeyClick(int key, int chr) { return false; }
+	virtual bool	MouseMove(float x, float y) { x, y; return false; }
+	virtual bool	MouseLButton(bool bDown) { bDown; return false; }
+	virtual bool	MouseRButton(bool bDown) { bDown; return false; }
+	virtual bool	MouseWheel(int nNotches) { nNotches; return false; }
+	virtual bool	KeyClick(int key, int chr) { key, chr; return false; }
 
 	virtual void	SetColor(DWORD _color) { color=_color; }
 	

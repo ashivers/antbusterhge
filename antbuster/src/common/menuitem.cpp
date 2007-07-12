@@ -9,7 +9,7 @@
 // In menuitem.cpp/h we define the
 // behaviour of our custom GUI control
 
-#include "menuitem.h"
+#include "common/menuitem.h"
 
 // This is a GUI control constructor,
 // we should initialize all the variables here
@@ -183,6 +183,7 @@ bool hgeGUIMenuItem::MouseLButton(bool bDown)
 // receive the control's ID
 bool hgeGUIMenuItem::KeyClick(int key, int chr)
 {
+	chr;
 	if(key==HGEK_ENTER || key==HGEK_SPACE)
 	{
 		MouseLButton(true);

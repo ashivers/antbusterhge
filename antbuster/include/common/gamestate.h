@@ -42,13 +42,14 @@ public:
     GameState *FindState(const string &name) const;
 
     static GameStateManager *Instance();
+    static void ReleaseInstance();
 
 protected:
     bool OnFrame();
     static GameStateManager *sInstance;
 
-    friend bool FrameFunc();
-    friend bool RenderFunc();
+    friend static bool FrameFunc();
+    friend static bool RenderFunc();
 
     vector<GameState *> states;
     string requestState;

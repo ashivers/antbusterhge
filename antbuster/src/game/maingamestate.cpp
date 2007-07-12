@@ -1,23 +1,42 @@
 #include <cmath>
 #include <cassert>
 
-#include "maingamestate.h"
 #include "hgefont.h"
 #include "hgesprite.h"
 
-#include "ant.h"
-#include "bullet.h"
-#include "cannon.h"
+#include "game/maingamestate.h"
+
+#include "entity/ant.h"
+#include "entity/bullet.h"
+#include "entity/cannon.h"
 
 hgeFont *fnt;
-
+MainGameState::~MainGameState()
+{
+    assert(!hge);
+    assert(ants.empty());
+    assert(cannons.empty());
+}
 void MainGameState::OnEnter()
 {
     hge = hgeCreate(HGE_VERSION);
+
+    ants.push_back(new Ant);
 }
 
 void MainGameState::OnLeave()
 {
+    for (vector<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
+    {
+        delete *ant;
+    }
+    for (vector<Cannon *>::iterator cannon = cannons.begin(); cannon != cannons.end(); ++cannon)
+    {
+        delete *cannon;
+    }
+    ants.clear();
+    cannons.clear();
+
     hge->Release();
     hge = 0;
 }

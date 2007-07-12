@@ -1,7 +1,7 @@
 #ifndef MAINGAMESTATE_H
 #define MAINGAMESTATE_H
 
-#include "gamestate.h"
+#include "common/gamestate.h"
 class Ant;
 class Cannon;
 class hgeFont;
@@ -13,6 +13,8 @@ public:
     MainGameState() : hge(0)
     {
     }
+    virtual ~MainGameState();
+
     virtual void OnEnter();
     virtual void OnLeave();
     virtual void OnFrame();

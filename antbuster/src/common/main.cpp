@@ -1,6 +1,6 @@
 #include "hge.h"
-#include "maingamestate.h"
-#include "mainmenustate.h"
+#include "game/maingamestate.h"
+#include "menu/mainmenustate.h"
 
 int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
 {	
@@ -8,8 +8,6 @@ int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
     HGE *hge = hgeCreate(HGE_VERSION);
     hge->System_SetState(HGE_LOGFILE, "SysInfo.log");
     hge->System_SetState(HGE_INIFILE, "SysINI.ini");
-    hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);
-    hge->System_SetState(HGE_RENDERFUNC, RenderFunc);
     hge->System_SetState(HGE_TITLE, "Antbuster");
     hge->System_SetState(HGE_WINDOWED, true);
     hge->System_SetState(HGE_SCREENWIDTH, 800);
@@ -37,6 +35,7 @@ int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
     {
         hge->System_Start();
     }
+    GameStateManager::ReleaseInstance();
 
     hge->System_Shutdown();
     hge->Release();
