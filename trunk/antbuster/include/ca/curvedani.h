@@ -96,6 +96,7 @@ namespace cAni
         virtual void *getStateAddr(StateId sid) = 0;
         virtual void setState(StateId sid, const void *value) = 0;
         virtual const void *getState(StateId sid) const = 0;
+        virtual void reset() = 0;
     };
     class iRenderer
     {

@@ -34,6 +34,11 @@ void GameStateManager::ReleaseInstance()
 {
     if (sInstance)
     {
+        if (sInstance->curState)
+        {
+            sInstance->curState->OnLeave();
+            sInstance->curState = 0;
+        }
         delete sInstance;
         sInstance = 0;
     }
@@ -49,11 +54,7 @@ GameStateManager::GameStateManager() : curState(0)
 }
 GameStateManager::~GameStateManager()
 {
-    if (curState)
-    {
-        curState->OnLeave();
-        curState = 0;
-    }
+    assert(!curState);
 }
 
 GameState *GameStateManager::FindState(const string &name) const
@@ -84,7 +85,10 @@ bool GameStateManager::OnFrame()
     if (!requestState.empty())
     {
         if (curState)
+        {
             curState->OnLeave();
+            curState = 0;
+        }
         if (requestState == "exit")
             return true;
         curState = FindState(requestState);
