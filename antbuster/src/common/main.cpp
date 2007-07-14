@@ -23,6 +23,7 @@ int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
 #endif
 #endif
 
+
     MainMenuState mms;
     mms.SetName("mainmenu");
     GameStateManager::Instance()->RegisterState(&mms);

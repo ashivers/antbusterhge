@@ -154,6 +154,16 @@ public:
     {
         
     }
+    virtual void reset()
+    {
+        image = Image();
+        position = hgeVector(0, 0);
+        scale = hgeVector(1, 1);
+        angle = 0;
+        alpha = 1;
+        color = Point3f(1, 1, 1);
+    }
+
     virtual StateId StringToStateId(const char *name)
     {
         return name, 0;

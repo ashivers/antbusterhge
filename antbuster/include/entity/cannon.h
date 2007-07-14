@@ -2,8 +2,9 @@
 #define CANNON_H
 
 #include "caAnimation.h"
+#include "common/entity.h"
 
-class Cannon
+class Cannon : public Entity
 {
 public:
     Cannon();

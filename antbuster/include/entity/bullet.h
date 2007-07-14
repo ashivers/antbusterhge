@@ -2,8 +2,9 @@
 #define BULLET_H
 
 #include "caAnimation.h"
+#include "common/entity.h"
 
-class Bullet
+class Bullet : public Entity
 {
 public:
     Bullet();
