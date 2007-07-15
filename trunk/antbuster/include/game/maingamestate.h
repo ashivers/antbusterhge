@@ -1,11 +1,15 @@
 #ifndef MAINGAMESTATE_H
 #define MAINGAMESTATE_H
 
+#include <list>
+
 #include <hgegui.h>
 #include <caAnimation.h>
 #include <hgeCurvedAni.h>
 #include "common/gamestate.h"
 #include "entity/cannon.h"
+
+using namespace std;
 
 class Ant;
 class Bullet;
@@ -45,11 +49,12 @@ protected:
 
     vector<Ant *> ants;
     vector<BaseCannon *> cannons;
-    vector<Bullet *> bullets;
+    list<Bullet *> bullets;
     cAni::AnimResManager *animResManager;
     hgeCurvedAniSystem *system;
 
     bool mouseLButtonDown;
+    cAni::Animation *bg;
     hgeSprite *cursor;
     hgeGUI *gui;
     static MainGameState *s_Instance;

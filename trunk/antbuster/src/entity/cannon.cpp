@@ -49,6 +49,7 @@ void BaseCannon::step()
         float curtime = hge->Timer_GetTime();
         if ((curtime - lastFireTime) * this->data->freq > 1 && (this->targetPos - this->pos).Length() <= this->data->range)
         {
+            lastFireTime = curtime;
             MainGameState::GetInstance()->fire(this->pos, *ant, this->data->getBulletData());
         }
         hge->Release();

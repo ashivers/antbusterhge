@@ -42,10 +42,20 @@ void MainGameState::OnEnter()
     cursor = new hgeSprite(tex, 0, 0, 32, 32);
     gui->SetCursor(cursor);
     gui->Enter();
+
+    bg = new cAni::Animation(2);
+    bg->setAnimData(this->animResManager->getAnimData("data/bg0.xml"), 0); // 
+    bg->setAnimData(this->animResManager->getAnimData("data/bg1.xml"), 1);
+    bg->startAnim(int(60 * hge->Timer_GetTime()), 0);
 }
 
 void MainGameState::OnLeave()
 {
+    if (bg)
+    {
+        delete bg;
+        bg = 0;
+    }
     if (gui)
     {
         delete gui;
@@ -66,8 +76,13 @@ void MainGameState::OnLeave()
     {
         delete *cannon;
     }
+    for (list<Bullet *>::iterator bullet = bullets.begin(); bullet != bullets.end(); ++bullet)
+    {
+        delete *bullet;
+    }
     ants.clear();
     cannons.clear();
+    bullets.clear();
     if (animResManager)
     {
         delete animResManager;
@@ -119,15 +134,26 @@ void MainGameState::OnFrame()
     {
         (*cannon)->step();
     }
+    for (list<Bullet *>::iterator bullet = bullets.begin(); bullet != bullets.end(); )
+    {
+        (*bullet)->step();
+        if (!(*bullet)->isActive())
+        {
+            (*bullet)->data->releaseInstance(*bullet);
+            bullet = bullets.erase(bullet);
+        }
+        else
+            ++bullet;
+    }
 }
 
 void MainGameState::OnRender()
 {
     hge->Gfx_BeginScene(0);
     hge->Gfx_Clear(0xff22bb33);//黑色背景
-    hge->Gfx_SetTransform();
-    gui->Render();
     int time = int(60 * hge->Timer_GetTime());
+    hge->Gfx_SetTransform(0, 0, 400, 300, 0, 1, 1);
+    bg->render(time, 0);
     for (vector<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
     {
         (*ant)->render(time);
@@ -136,6 +162,12 @@ void MainGameState::OnRender()
     {
         (*cannon)->render(time);
     }
+    for (list<Bullet *>::iterator bullet = bullets.begin(); bullet != bullets.end(); ++bullet)
+    {
+        (*bullet)->render(time);
+    }
+    hge->Gfx_SetTransform();
+    gui->Render();
 
     // 游戏状态信息
     hge->Gfx_EndScene();
