@@ -1,8 +1,10 @@
 #include <cmath>
 #include <cassert>
+#include <cctype>
 
-#include "hgefont.h"
-#include "hgesprite.h"
+#include <hgefont.h>
+#include <hgesprite.h>
+#include <hgeguictrls.h>
 
 #include "game/maingamestate.h"
 #include "common/entity.h"
@@ -11,12 +13,17 @@
 #include "entity/cannon.h"
 
 hgeFont *fnt;
+MainGameState *MainGameState::s_Instance = 0;
 MainGameState::~MainGameState()
 {
+    assert(!cursor);
+    assert(!gui);
+    assert(s_Instance == this);
     assert(!animResManager && !system);
     assert(!hge);
     assert(ants.empty());
     assert(cannons.empty());
+    s_Instance = 0;
 }
 void MainGameState::OnEnter()
 {
@@ -24,17 +31,38 @@ void MainGameState::OnEnter()
     assert(!animResManager && !system);
     animResManager = new cAni::AnimResManager;
     system = new hgeCurvedAniSystem;
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 10; i++)
         ants.push_back(new Ant(*animResManager));
+
+    mouseLButtonDown = hge->Input_GetKeyState(HGEK_LBUTTON);
+
+    gui = new hgeGUI;
+    // gui->AddCtrl(new hgeGUIButton(1, 100, 520, 10, 10,));
+    HTEXTURE tex = hge->Texture_Load("data/cursor.png");
+    cursor = new hgeSprite(tex, 0, 0, 32, 32);
+    gui->SetCursor(cursor);
+    gui->Enter();
 }
 
 void MainGameState::OnLeave()
 {
+    if (gui)
+    {
+        delete gui;
+        gui = 0;
+    }
+    if (cursor)
+    {
+        HTEXTURE tex = cursor->GetTexture();
+        delete cursor;
+        hge->Texture_Free(tex);
+        cursor = 0;
+    }
     for (vector<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
     {
         delete *ant;
     }
-    for (vector<Cannon *>::iterator cannon = cannons.begin(); cannon != cannons.end(); ++cannon)
+    for (vector<BaseCannon *>::iterator cannon = cannons.begin(); cannon != cannons.end(); ++cannon)
     {
         delete *cannon;
     }
@@ -54,7 +82,13 @@ void MainGameState::OnLeave()
     hge->Release();
     hge = 0;
 }
-
+void MainGameState::addCannon(BaseCannon::CannonId cannonid, float x, float y)
+{
+    assert(cannonid >= 0 && cannonid < BaseCannon::NumCannonId);
+    BaseCannon *cannon = g_cannonData[cannonid].createInstance(*animResManager);
+    cannon->setPos(hgeVector(x, y));
+    cannons.push_back(cannon);
+}
 void MainGameState::OnFrame()
 {
     if (hge->Input_GetKeyState(HGEK_ESCAPE))
@@ -63,11 +97,25 @@ void MainGameState::OnFrame()
         RequestState("exit");
     }
 
+    if (hge->Input_GetKeyState(HGEK_LBUTTON))
+    {
+        if (!mouseLButtonDown)
+        {
+            float x, y;
+            hge->Input_GetMousePos(&x, &y);
+            addCannon(BaseCannon::CI_Cannon, x, y);
+        }
+        mouseLButtonDown = true;
+    }
+    else
+        mouseLButtonDown = false;
+
+    gui->Update(hge->Timer_GetDelta());
     for (vector<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
     {
         (*ant)->step();
     }
-    for (vector<Cannon *>::iterator cannon = cannons.begin(); cannon != cannons.end(); ++cannon)
+    for (vector<BaseCannon *>::iterator cannon = cannons.begin(); cannon != cannons.end(); ++cannon)
     {
         (*cannon)->step();
     }
@@ -77,16 +125,43 @@ void MainGameState::OnRender()
 {
     hge->Gfx_BeginScene(0);
     hge->Gfx_Clear(0xff22bb33);//黑色背景
+    hge->Gfx_SetTransform();
+    gui->Render();
     int time = int(60 * hge->Timer_GetTime());
     for (vector<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
     {
         (*ant)->render(time);
     }
-    for (vector<Cannon *>::iterator cannon = cannons.begin(); cannon != cannons.end(); ++cannon)
+    for (vector<BaseCannon *>::iterator cannon = cannons.begin(); cannon != cannons.end(); ++cannon)
     {
         (*cannon)->render(time);
     }
 
     // 游戏状态信息
     hge->Gfx_EndScene();
+}
+
+Ant *MainGameState::getTargetAnt(const hgeVector &pos)
+{
+    Ant *bestAnt = 0;
+    float distance = 1e10;
+    for (vector<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
+    {
+        float d = ((*ant)->getPos() - pos).Length();
+        if (d < distance)
+        {
+            distance = d;
+            bestAnt = *ant;
+        }
+    }
+    return bestAnt;
+}
+
+void MainGameState::fire(const hgeVector &pos, Ant &targetAnt, const BulletData &bulletData)
+{
+    assert(this->animResManager);
+    Bullet *bullet = bulletData.createInstance(*this->animResManager);
+    bullet->setPos(pos);
+    bullet->setTarget(targetAnt);
+    this->bullets.push_back(bullet);
 }
