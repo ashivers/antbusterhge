@@ -8,12 +8,13 @@ const int dMaxlen = 50;
 
 Ant::Ant(cAni::AnimResManager &arm) : Entity(arm)
 {
-    dest.x = pos.x = rand() % border.GetWidth() + border.left;
-    dest.y = pos.y = rand() % border.GetHeight() + border.top;
-    angle = (float)rand() / RAND_MAX * 3.1415926;
+    dest.x = pos.x = float(rand() % border.GetWidth() + border.left);
+    dest.y = pos.y = float(rand() % border.GetHeight() + border.top);
+    angle = (float)rand() / RAND_MAX * 3.1415926f;
     hp = 100;
     level = 1;
     speed = 1.0f;
+    refCount = 0;
 
     anim.setAnimData(animResManager.getAnimData("data/ant.xml"), 0);
     hpAnim.setAnimData(animResManager.getAnimData("data/anthp.xml"), 0);
@@ -28,7 +29,7 @@ void Ant::render(int time)
     hpAnim.render(hp, 0);
     hge->Gfx_SetTransform();
     float alpha = (dest - pos).Length() / 50;
-    DWORD color = 255 * alpha;
+    DWORD color = int(255 * alpha);
     if (color > 255) color = 255;
     color = color<<24 | 0xffffff;
     hge->Gfx_RenderLine(pos.x, pos.y, dest.x, dest.y, color);
@@ -41,8 +42,8 @@ void Ant::step()
     {
         int dx = rand() % (dMaxlen * 2 + 1) - dMaxlen;
         int dy = rand() % (dMaxlen * 2 + 1) - dMaxlen;
-        if (dx > 0) dx += dlen; else dx -= dlen;
-        if (dy > 0) dy += dlen; else dy -= dlen;
+        if (dx > 0) dx += (int)dlen; else dx -= (int)dlen;
+        if (dy > 0) dy += (int)dlen; else dy -= (int)dlen;
         dest = hgeVector(pos.x + dx, pos.y + dy);
         if (dest.x < border.left)
             dest.x = border.left;
