@@ -3,7 +3,8 @@
 #include "game/maingamestate.h"
 Bullet::Bullet(cAni::AnimResManager &arm, const BulletData *_data) : Entity(arm), data(_data)
 {
-
+    anim.setAnimData(data->getAd_move(), 0);
+    anim.startAnim(0, 0);
 }
 void Bullet::setTarget(Ant &ant)
 {
@@ -11,11 +12,40 @@ void Bullet::setTarget(Ant &ant)
 }
 void Bullet::render(int time)
 {
+    HGE *hge = hgeCreate(HGE_VERSION);
+    hgeVector dir = target - pos;
+    hgeVector up(0, -1);
+    if (dir.Length() < 0.5f)
+    {
+        dir = up;
+    }
+    else
+    {
+        dir.Normalize();
+    }
+    float angle = dir.Angle(&up);
+    if (dir.x > 0)
+        angle = -angle;
+    hge->Gfx_SetTransform(0, 0, pos.x, pos.y, angle, 1, 1);
     anim.render(time, 0);
+
+    hge->Release();
 }
 
 void Bullet::step()
 {
+    hgeVector dir = target - pos;
+    float distance = dir.Length();
+    if (distance < this->data->bulletSpeed)
+    {
+        active = false;
+    }
+    else
+    {
+        dir.Normalize();
+        dir *= this->data->bulletSpeed;
+        pos += dir;
+    }
 }
 void Missile::setTarget(Ant &ant)
 {
@@ -82,7 +112,7 @@ void BulletData::releaseInstance(Bullet *bullet) const // ÊÍ·Å¸Ã×Óµ¯
 
 BulletData g_bulletData[Bullet::NumBulletId] =
 {
-    {Bullet::BI_CannonA, "Cannon A", 1.0, 1, "data/bullet_fire.xml", "data/bulleta.xml", "data/bullet_explode.xml", },
+    {Bullet::BI_CannonA, "Cannon A", 1.0, 1, "", "data/bullet.xml", "", },
     {Bullet::BI_CannonB, "Cannon B", 2.0, 2, "data/bullet_fire.xml", "data/bulletb.xml", "data/bullet_explode.xml", },
     {Bullet::BI_CannonC, "Cannon C", 3.0, 4, "data/bullet_fire.xml", "data/bulletc.xml", "data/bullet_explode.xml", },
     {Bullet::BI_CannonD, "Cannon D", 4.0, 8, "data/bullet_fire.xml", "data/bulletd.xml", "data/bullet_explode.xml", },

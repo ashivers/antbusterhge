@@ -2,7 +2,7 @@
 #include "caRect.h"
 #include "entity/ant.h"
 
-const cAni::Rect border(100, 700, 100, 500);
+const cAni::Rect border(150 + 16, 650 - 16, 50 + 16, 448 - 16);
 const float dlen = 20;
 const int dMaxlen = 50;
 
