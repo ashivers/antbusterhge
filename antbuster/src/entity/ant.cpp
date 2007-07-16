@@ -11,12 +11,20 @@ Ant::Ant(cAni::AnimResManager &arm) : Entity(arm)
     dest.x = pos.x = float(rand() % border.GetWidth() + border.left);
     dest.y = pos.y = float(rand() % border.GetHeight() + border.top);
     angle = (float)rand() / RAND_MAX * 3.1415926f;
-    level = 1;
-    hp = this->getMaxHp();
-    refCount = 0;
+    this->level = 1;
+    this->hp = this->getMaxHp();
+    this->refCount = 0;
     memset(damageEffect, 0, sizeof(damageEffect));
     anim.setAnimData(animResManager.getAnimData("data/ant.xml"), 0);
     hpAnim.setAnimData(animResManager.getAnimData("data/anthp.xml"), 0);
+}
+
+void Ant::initAnt(const hgeVector &spawnPos, int level)
+{
+    this->dest = this->pos = spawnPos;
+    this->level = level;
+    this->hp = this->getMaxHp();
+    memset(damageEffect, 0, sizeof(damageEffect));
 }
 
 void Ant::render(int time)
