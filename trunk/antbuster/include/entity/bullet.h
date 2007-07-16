@@ -61,6 +61,7 @@ struct BulletData
     const cAni::AnimData *getAd_explode() const; // 爆炸
     Bullet *createInstance(cAni::AnimResManager &arm) const; // 生成一个新的本类型子弹
     void releaseInstance(Bullet *bullet) const; // 释放该子弹
+    void applyDamage(Ant &ant) const;
 };
 
 extern BulletData g_bulletData[Bullet::NumBulletId];

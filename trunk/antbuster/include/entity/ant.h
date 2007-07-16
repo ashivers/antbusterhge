@@ -8,10 +8,20 @@
 /* @class Ant
  * @note ant
  */
-
 class Ant : public Entity
 {
 public:
+    enum DamageType
+    {
+        DT_Normal, // ÆÕÍ¨¹¥»÷
+        DT_Impact, // ³å»÷
+        DT_Frozen, // ±ù¶³
+        DT_Fire,   // »ðÑæ
+        DT_Poison, // ÖÐ¶¾
+
+        NumDamageType,
+    };
+
     Ant(cAni::AnimResManager &arm);
     virtual void render(int time);
     virtual void step();
@@ -24,9 +34,13 @@ public:
     {
         return hp;
     }
+    float getSpeed() const;
+    void applyDamage(DamageType damageType, int damage);
     int refCount; // do not delete the ant if refCount is not 0, this is used by missile like bullets
 
 protected:
+    void applyDamageEffect();
+
     int hp;
     int level;
 
@@ -34,10 +48,10 @@ protected:
     cAni::Animation hpAnim;
     hgeVector pos;
     float angle;
-    float speed;
 
     hgeVector dest;
 
+    int damageEffect[NumDamageType];
 };
 
 /*

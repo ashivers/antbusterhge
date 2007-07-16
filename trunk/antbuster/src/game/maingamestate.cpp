@@ -12,8 +12,8 @@
 #include "entity/bullet.h"
 #include "entity/cannon.h"
 
-hgeFont *fnt;
 MainGameState *MainGameState::s_Instance = 0;
+
 MainGameState::~MainGameState()
 {
     assert(!cursor);
@@ -25,6 +25,7 @@ MainGameState::~MainGameState()
     assert(cannons.empty());
     s_Instance = 0;
 }
+
 void MainGameState::OnEnter()
 {
     hge = hgeCreate(HGE_VERSION);
@@ -97,6 +98,7 @@ void MainGameState::OnLeave()
     hge->Release();
     hge = 0;
 }
+
 void MainGameState::addCannon(BaseCannon::CannonId cannonid, float x, float y)
 {
     assert(cannonid >= 0 && cannonid < BaseCannon::NumCannonId);
@@ -104,6 +106,7 @@ void MainGameState::addCannon(BaseCannon::CannonId cannonid, float x, float y)
     cannon->setPos(hgeVector(x, y));
     cannons.push_back(cannon);
 }
+
 void MainGameState::OnFrame()
 {
     if (hge->Input_GetKeyState(HGEK_ESCAPE))
@@ -196,4 +199,27 @@ void MainGameState::fire(const hgeVector &pos, Ant &targetAnt, const BulletData 
     bullet->setPos(pos);
     bullet->setTarget(targetAnt);
     this->bullets.push_back(bullet);
+}
+struct CmpNearestFrom
+{
+    hgeVector pos;
+    CmpNearestFrom(const hgeVector &_pos) : pos(_pos)
+    {
+    }
+    bool operator () (Ant *const a, Ant *const b) const
+    {
+        return (a->getPos() - pos).Length() < (b->getPos() - pos).Length();
+    }
+};
+void MainGameState::getNearestAnts(vector<Ant *> &hitAnts, const hgeVector &pos, float maxRange)
+{
+    for (vector<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
+    {
+        float d = ((*ant)->getPos() - pos).Length();
+        if (d < maxRange)
+        {
+            hitAnts.push_back(*ant);
+        }
+    }
+    sort(ants.begin(), ants.end(), CmpNearestFrom(pos));
 }
