@@ -20,6 +20,7 @@ package.config["Debug"].target = "antbuster_d"
 package.config["Release"].objdir = "./Release/demo"
 package.config["Release"].target = "antbuster"
 
+package.linkoptions ={ "/NODEFAULTLIB:'libc'" }
 package.buildflags = {"no-main", "extra-warnings", "static-runtime", "no-exceptions", "no-rtti" }
 package.config["Debug"].links = { "hge", "hgehelp", "curvedani_d", "hgeport_d" }
 package.config["Release"].links = { "hge", "hgehelp", "curvedani", "hgeport" }
