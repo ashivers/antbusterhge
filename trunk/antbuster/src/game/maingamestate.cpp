@@ -12,8 +12,11 @@
 #include "entity/bullet.h"
 #include "entity/cannon.h"
 
-MainGameState *MainGameState::s_Instance = 0;
+#ifndef SAFE_DELETE
+#define SAFE_DELETE(a) if (!a);else {delete a; a = 0;}
+#endif
 
+MainGameState *MainGameState::s_Instance = 0;
 MainGameState::~MainGameState()
 {
     assert(!cursor);
@@ -32,8 +35,9 @@ void MainGameState::OnEnter()
     assert(!animResManager && !system);
     animResManager = new cAni::AnimResManager;
     system = new hgeCurvedAniSystem;
-    for (int i = 0; i < 10; i++)
-        ants.push_back(new Ant(*animResManager));
+
+    curAntLevel = 1;
+    lastSpawnAntTime = hge->Timer_GetTime();
 
     mouseLButtonDown = hge->Input_GetKeyState(HGEK_LBUTTON);
 
@@ -55,21 +59,9 @@ void MainGameState::OnEnter()
 
 void MainGameState::OnLeave()
 {
-    if (bg)
-    {
-        delete bg;
-        bg = 0;
-    }
-    if (cake)
-    {
-        delete cake;
-        cake = 0;
-    }
-    if (gui)
-    {
-        delete gui;
-        gui = 0;
-    }
+    SAFE_DELETE(bg);
+    SAFE_DELETE(cake);
+    SAFE_DELETE(gui);
     if (cursor)
     {
         HTEXTURE tex = cursor->GetTexture();
@@ -77,7 +69,7 @@ void MainGameState::OnLeave()
         hge->Texture_Free(tex);
         cursor = 0;
     }
-    for (vector<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
+    for (list<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
     {
         delete *ant;
     }
@@ -137,9 +129,26 @@ void MainGameState::OnFrame()
         mouseLButtonDown = false;
 
     gui->Update(hge->Timer_GetDelta());
-    for (vector<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
+    for (list<Ant *>::iterator ant = ants.begin(); ant != ants.end(); )
     {
         (*ant)->step();
+        if (!(*ant)->isActive())
+        {
+            delete *ant;
+            ant = ants.erase(ant);
+        }
+        else
+            ++ant;
+    }
+    if (ants.size() < 6)
+    {
+        if (hge->Timer_GetTime() - lastSpawnAntTime > 1)
+        {
+            lastSpawnAntTime = hge->Timer_GetTime();
+            Ant *ant = new Ant(*animResManager);
+            ant->initAnt(hgeVector(184, 83), this->curAntLevel++);
+            ants.push_back(ant);
+        }
     }
     for (vector<BaseCannon *>::iterator cannon = cannons.begin(); cannon != cannons.end(); ++cannon)
     {
@@ -167,7 +176,7 @@ void MainGameState::OnRender()
     bg->render(time, 0);
     hge->Gfx_SetTransform(0, 0, 620, 417, 0, 1, 1);
     cake->render(time / 10, 0);
-    for (vector<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
+    for (list<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
     {
         (*ant)->render(time);
     }
@@ -190,7 +199,7 @@ Ant *MainGameState::getTargetAnt(const hgeVector &pos)
 {
     Ant *bestAnt = 0;
     float distance = 1e10;
-    for (vector<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
+    for (list<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
     {
         float d = ((*ant)->getPos() - pos).Length();
         if (d < distance)
@@ -223,7 +232,7 @@ struct CmpNearestFrom
 };
 void MainGameState::getNearestAnts(vector<Ant *> &hitAnts, const hgeVector &pos, float maxRange)
 {
-    for (vector<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
+    for (list<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
     {
         float d = ((*ant)->getPos() - pos).Length();
         if (d < maxRange)
@@ -231,5 +240,5 @@ void MainGameState::getNearestAnts(vector<Ant *> &hitAnts, const hgeVector &pos,
             hitAnts.push_back(*ant);
         }
     }
-    sort(ants.begin(), ants.end(), CmpNearestFrom(pos));
+    sort(hitAnts.begin(), hitAnts.end(), CmpNearestFrom(pos));
 }

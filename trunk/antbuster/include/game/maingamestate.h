@@ -48,11 +48,14 @@ protected:
 
     HGE *hge;
 
-    vector<Ant *> ants;
+    list<Ant *> ants;
     vector<BaseCannon *> cannons;
     list<Bullet *> bullets;
     cAni::AnimResManager *animResManager;
     hgeCurvedAniSystem *system;
+
+    int curAntLevel;
+    float lastSpawnAntTime;
 
     bool mouseLButtonDown;
     cAni::Animation *bg;

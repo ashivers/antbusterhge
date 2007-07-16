@@ -26,6 +26,7 @@ public:
     virtual void render(int time);
     virtual void step();
 
+    void initAnt(const hgeVector &spawnPos, int level);
     const hgeVector &getPos() const
     {
         return pos;
