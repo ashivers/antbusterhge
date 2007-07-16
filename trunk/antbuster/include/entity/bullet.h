@@ -27,6 +27,10 @@ public:
     {
         this->pos = pos;
     }
+    void setTarget(const hgeVector &target)
+    {
+        this->target = target;
+    }
     virtual void setTarget(Ant &ant);
     cAni::Animation anim;
 

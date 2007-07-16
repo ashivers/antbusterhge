@@ -219,6 +219,16 @@ void MainGameState::fire(const hgeVector &pos, Ant &targetAnt, const BulletData 
     bullet->setTarget(targetAnt);
     this->bullets.push_back(bullet);
 }
+
+void MainGameState::fire(const hgeVector &pos, const hgeVector &targetDirection, const BulletData &bulletData)
+{
+    assert(this->animResManager);
+    Bullet *bullet = bulletData.createInstance(*this->animResManager);
+    bullet->setPos(pos);
+    bullet->setTarget(pos + targetDirection);
+    this->bullets.push_back(bullet);
+}
+
 struct CmpNearestFrom
 {
     hgeVector pos;
