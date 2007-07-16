@@ -44,13 +44,17 @@ void BaseCannon::step()
     Ant *ant = MainGameState::GetInstance()->getTargetAnt(this->pos);
     if (ant)
     {
-        this->targetPos = ant->getPos();
+        hgeVector tp = ant->getPos();
         HGE* hge = hgeCreate(HGE_VERSION);
         float curtime = hge->Timer_GetTime();
-        if ((curtime - lastFireTime) * this->data->freq > 1 && (this->targetPos - this->pos).Length() <= this->data->range)
+        if ((curtime - lastFireTime) * this->data->freq > 1 && (tp - this->pos).Length() <= this->data->range)
         {
+            this->targetPos = tp;
             lastFireTime = curtime;
-            MainGameState::GetInstance()->fire(this->pos, *ant, this->data->getBulletData());
+            hgeVector dir = ant->getPos() - this->pos;
+            dir.Normalize();
+            dir *= this->data->range;
+            MainGameState::GetInstance()->fire(this->pos, dir, this->data->getBulletData());
         }
         hge->Release();
     }
@@ -78,7 +82,8 @@ const cAni::AnimData *CannonData::getAd_tower() const
 */
 CannonData g_cannonData[BaseCannon::NumCannonId] = 
 {
-//  id                      parent                  name                攻击频率 子弹                           射程	伤害	建造费用
+    //id                      parent
+    //   name             攻击频率      子弹          射程     炮座                   炮塔                    建造费用
     {BaseCannon::CI_Cannon, size_t(-1),
         "Cannon",           3.0f, Bullet::BI_CannonA, 110.0f, "data/cannon_base.xml", "data/cannon_tower.xml", -1},
     {BaseCannon::CI_HeavyCannon1, BaseCannon::CI_Cannon,

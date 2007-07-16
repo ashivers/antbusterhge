@@ -34,7 +34,6 @@ protected:
     cAni::Animation anim_tower;
 
     hgeVector pos;
-
     hgeVector targetPos;
 
     float lastFireTime;

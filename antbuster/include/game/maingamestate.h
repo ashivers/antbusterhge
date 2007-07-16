@@ -42,6 +42,7 @@ public:
     }
     Ant *getTargetAnt(const hgeVector &pos);
     void fire(const hgeVector &pos, Ant &targetAnt, const BulletData &bulletData);
+    void fire(const hgeVector &pos, const hgeVector &targetDirection, const BulletData &bulletData);
     void getNearestAnts(vector<Ant *> &hitAnts, const hgeVector &pos, float maxRange);
 protected:
     void addCannon(BaseCannon::CannonId cannonid, float x, float y);
