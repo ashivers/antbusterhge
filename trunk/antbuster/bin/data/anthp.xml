@@ -1,4 +1,4 @@
-<CurvedAni length="100" numDataSets="7" numInterpolaters="5" numAnimElements="2">
+<CurvedAni length="101" numDataSets="7" numInterpolaters="5" numAnimElements="2">
     <DataSet name="CDS_HGE_Image" numData="1"> <!-- image data -->
         <Data time="0" value="data/ant.png;3,34,6,54" />
     </DataSet>

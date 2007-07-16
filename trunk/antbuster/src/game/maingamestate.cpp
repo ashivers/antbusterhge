@@ -48,6 +48,9 @@ void MainGameState::OnEnter()
     bg->setAnimData(this->animResManager->getAnimData("data/bg0.xml"), 0); // 
     bg->setAnimData(this->animResManager->getAnimData("data/bg1.xml"), 1);
     bg->startAnim(int(60 * hge->Timer_GetTime()), 0);
+
+    cake = new cAni::Animation;
+    cake->setAnimData(this->animResManager->getAnimData("data/cake.xml"), 0);
 }
 
 void MainGameState::OnLeave()
@@ -56,6 +59,11 @@ void MainGameState::OnLeave()
     {
         delete bg;
         bg = 0;
+    }
+    if (cake)
+    {
+        delete cake;
+        cake = 0;
     }
     if (gui)
     {
@@ -157,6 +165,8 @@ void MainGameState::OnRender()
     int time = int(60 * hge->Timer_GetTime());
     hge->Gfx_SetTransform(0, 0, 400, 300, 0, 1, 1);
     bg->render(time, 0);
+    hge->Gfx_SetTransform(0, 0, 620, 417, 0, 1, 1);
+    cake->render(time / 10, 0);
     for (vector<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
     {
         (*ant)->render(time);

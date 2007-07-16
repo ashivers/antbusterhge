@@ -56,6 +56,7 @@ protected:
 
     bool mouseLButtonDown;
     cAni::Animation *bg;
+    cAni::Animation *cake;
     hgeSprite *cursor;
     hgeGUI *gui;
     static MainGameState *s_Instance;

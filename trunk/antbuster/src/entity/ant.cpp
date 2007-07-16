@@ -11,8 +11,8 @@ Ant::Ant(cAni::AnimResManager &arm) : Entity(arm)
     dest.x = pos.x = float(rand() % border.GetWidth() + border.left);
     dest.y = pos.y = float(rand() % border.GetHeight() + border.top);
     angle = (float)rand() / RAND_MAX * 3.1415926f;
-    hp = 100;
     level = 1;
+    hp = this->getMaxHp();
     refCount = 0;
     memset(damageEffect, 0, sizeof(damageEffect));
     anim.setAnimData(animResManager.getAnimData("data/ant.xml"), 0);
@@ -25,7 +25,7 @@ void Ant::render(int time)
     hge->Gfx_SetTransform(0, 0, (int)pos.x, (int)pos.y, -angle, 1, 1);
     anim.render(time, 0);
     hge->Gfx_SetTransform(0, 0, (int)pos.x, (int)pos.y, 0, 1, 1);
-    hpAnim.render(hp, 0);
+    hpAnim.render(100.0f * hp / this->getMaxHp(), 0);
     hge->Gfx_SetTransform();
     float alpha = (dest - pos).Length() / 50;
     DWORD color = int(255 * alpha);

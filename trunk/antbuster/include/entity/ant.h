@@ -34,6 +34,10 @@ public:
     {
         return hp;
     }
+    int getMaxHp() const
+    {
+        return int(4 * pow(1.1, level) - 1);
+    }
     float getSpeed() const;
     void applyDamage(DamageType damageType, int damage);
     int refCount; // do not delete the ant if refCount is not 0, this is used by missile like bullets
