@@ -13,9 +13,8 @@ Ant::Ant(cAni::AnimResManager &arm) : Entity(arm)
     angle = (float)rand() / RAND_MAX * 3.1415926f;
     hp = 100;
     level = 1;
-    speed = 1.0f;
     refCount = 0;
-
+    memset(damageEffect, 0, sizeof(damageEffect));
     anim.setAnimData(animResManager.getAnimData("data/ant.xml"), 0);
     hpAnim.setAnimData(animResManager.getAnimData("data/anthp.xml"), 0);
 }
@@ -34,6 +33,46 @@ void Ant::render(int time)
     color = color<<24 | 0xffffff;
     hge->Gfx_RenderLine(pos.x, pos.y, dest.x, dest.y, color);
     hge->Release();
+}
+
+void Ant::applyDamage(DamageType damageType, int damage)
+{
+    assert(damageType >= 0 && damageType < NumDamageType);
+    assert(damage > 0);
+    this->damageEffect[damageType] += damage;
+}
+void Ant::applyDamageEffect()
+{
+    hp -= damageEffect[DT_Normal]; // 普通攻击
+    damageEffect[DT_Normal] = 0;   // 立即生效
+
+    hp -= damageEffect[DT_Impact]; // 冲击
+    damageEffect[DT_Impact] /= 2;  // 有衰减的效果
+
+    if (damageEffect[DT_Frozen] > 0) // 冰冻
+        hp--, damageEffect[DT_Frozen]--; 
+
+    if (damageEffect[DT_Fire] > 0) // 火焰
+        hp--, damageEffect[DT_Fire]--; 
+
+    if (damageEffect[DT_Poison] > 0) // 中毒
+        hp--, damageEffect[DT_Poison]--; 
+
+    if (hp < 0)
+    {
+        hp = 0;
+        active = false;
+    }
+}
+
+float Ant::getSpeed() const
+{
+    float speed = 1.2f;
+    // if (cake) speed = 1.0f;
+    speed -= 0.1f * damageEffect[DT_Frozen];
+    if (speed < 0.3f)
+        speed = 0.3f;
+    return speed;
 }
 
 void Ant::step()
@@ -60,7 +99,7 @@ void Ant::step()
     hgeVector destdir = *(dest - pos).Normalize();
     float offangle = curdir.x * destdir.y - curdir.y * destdir.x;
     angle += offangle * 0.05f;
-    pos += curdir * speed * (1 - 2 * sqrt(abs(offangle)));
+    pos += curdir * getSpeed() * (1 - 2 * sqrt(abs(offangle)));
     if (pos.x < border.left)
         pos.x = border.left;
     if (pos.x > border.right)
@@ -70,8 +109,5 @@ void Ant::step()
     if (pos.y > border.bottom)
         pos.y = border.bottom;
 
-    if (hp > 0)
-        hp--;
-    else
-        hp = 100;
+    applyDamageEffect();
 }

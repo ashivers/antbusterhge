@@ -45,8 +45,17 @@ void Bullet::step()
         dir.Normalize();
         dir *= this->data->bulletSpeed;
         pos += dir;
+
+        vector<Ant *> hitAnts;
+        MainGameState::GetInstance()->getNearestAnts(hitAnts, this->pos, 16.0f);
+        if (!hitAnts.empty())
+        {
+            this->data->applyDamage(*hitAnts.front());
+            active = false;
+        }
     }
 }
+
 void Missile::setTarget(Ant &ant)
 {
     ant.refCount++;
@@ -94,10 +103,10 @@ Bullet *BulletData::createInstance(cAni::AnimResManager &arm) const// 生成一个新
     case Bullet::BI_CannonD:
         bullet = new Bullet(arm, this);
         break;
-        /*
-        case Bullet::BI_Missle:
-        bullet = new Missile;
-        */
+    /*
+    case Bullet::BI_Missle:
+    bullet = new Missile;
+    */
     default:
         assert(0);
         break;
@@ -109,7 +118,30 @@ void BulletData::releaseInstance(Bullet *bullet) const // 释放该子弹
     assert(bullet && bullet->data == this);
     delete bullet;
 }
-
+void BulletData::applyDamage(Ant &ant) const
+{
+    switch(this->bulletId)
+    {
+    case Bullet::BI_CannonA:
+        ant.applyDamage(Ant::DT_Normal, damage);
+        break;
+    case Bullet::BI_CannonB:
+        ant.applyDamage(Ant::DT_Normal, damage / 2);
+        ant.applyDamage(Ant::DT_Impact, damage / 2);
+        break;
+    case Bullet::BI_CannonC:
+        ant.applyDamage(Ant::DT_Normal, damage);
+        ant.applyDamage(Ant::DT_Impact, damage / 2);
+        break;
+    case Bullet::BI_CannonD:
+        ant.applyDamage(Ant::DT_Normal, damage);
+        ant.applyDamage(Ant::DT_Impact, damage);
+        break;
+    default:
+        assert(0);
+        break;
+    }
+}
 BulletData g_bulletData[Bullet::NumBulletId] =
 {
     {Bullet::BI_CannonA, "Cannon A", 1.0, 1, "", "data/bullet.xml", "", },
