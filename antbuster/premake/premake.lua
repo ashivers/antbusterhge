@@ -25,7 +25,8 @@ package.buildflags = {"no-main", "extra-warnings", "static-runtime", "no-excepti
 package.config["Debug"].links = { "hge", "hgehelp", "curvedani_d", "hgeport_d" }
 package.config["Release"].links = { "hge", "hgehelp", "curvedani", "hgeport" }
 package.includepaths = { "../../include", "../../include/ca", "../../include/hge" }
-package.libpaths = { "../../lib" }
+
+package.libpaths = { "../../lib", "../../lib/" .. target } 
 
 package.files = {
   matchrecursive("../../include/*.h", "../../src/*.cpp")
