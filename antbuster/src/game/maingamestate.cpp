@@ -15,7 +15,13 @@
 #ifndef SAFE_DELETE
 #define SAFE_DELETE(a) if (!a);else {delete a; a = 0;}
 #endif
-
+enum GUI_ID
+{
+    GID_BtnAddCannon = 1,
+    GID_BtnMute,
+    GID_BtnPause,
+    NumGUIId,
+};
 MainGameState *MainGameState::s_Instance = 0;
 MainGameState::~MainGameState()
 {
@@ -45,6 +51,11 @@ void MainGameState::OnEnter()
     // gui->AddCtrl(new hgeGUIButton(1, 100, 520, 10, 10,));
     HTEXTURE tex = hge->Texture_Load("data/cursor.png");
     cursor = new hgeSprite(tex, 0, 0, 32, 32);
+    this->texGui = hge->Texture_Load("data/ui.png");
+    gui->AddCtrl(new hgeGUIButton(GID_BtnAddCannon, 170, 465, 50, 51, this->texGui, 0, 0));
+    gui->AddCtrl(new hgeGUIButton(GID_BtnMute, 544, 503, 27, 28, this->texGui, 0, 52));
+    gui->AddCtrl(new hgeGUIButton(GID_BtnPause, 514, 503, 27, 28, this->texGui, 0, 85));
+
     gui->SetCursor(cursor);
     gui->Enter();
 
@@ -59,6 +70,11 @@ void MainGameState::OnEnter()
 
 void MainGameState::OnLeave()
 {
+    if (this->texGui)
+    {
+        hge->Texture_Free(this->texGui);
+        this->texGui = 0;
+    }
     SAFE_DELETE(bg);
     SAFE_DELETE(cake);
     SAFE_DELETE(gui);
@@ -128,7 +144,14 @@ void MainGameState::OnFrame()
     else
         mouseLButtonDown = false;
 
-    gui->Update(hge->Timer_GetDelta());
+    switch(gui->Update(hge->Timer_GetDelta()))
+    {
+    case GID_BtnAddCannon:
+    case GID_BtnPause:
+        break;
+    case GID_BtnMute:
+        break;
+    }
     for (list<Ant *>::iterator ant = ants.begin(); ant != ants.end(); )
     {
         (*ant)->step();
