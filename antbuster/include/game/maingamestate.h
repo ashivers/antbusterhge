@@ -56,14 +56,19 @@ protected:
     hgeCurvedAniSystem *system;
     HTEXTURE texGui;
 
+    int points;
+    int money;
     int curAntLevel;
     float lastSpawnAntTime;
+
+    bool bAddNewCannon;
 
     bool mouseLButtonDown;
     cAni::Animation *bg;
     cAni::Animation *cake;
-    hgeSprite *cursor;
+    hgeSprite *cursor, *cursorWithCannon;
     hgeGUI *gui;
+    hgeFont *font;
     static MainGameState *s_Instance;
 };
 
