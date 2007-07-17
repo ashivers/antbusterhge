@@ -43,18 +43,28 @@ void MainGameState::OnEnter()
     system = new hgeCurvedAniSystem;
 
     curAntLevel = 1;
+    points = 0;
+    money = 200;
+
     lastSpawnAntTime = hge->Timer_GetTime();
 
     mouseLButtonDown = hge->Input_GetKeyState(HGEK_LBUTTON);
+    bAddNewCannon = false;
 
+    font = new hgeFont("data/font.fnt");
+    font->SetColor(ARGB(255, 0, 255, 0));
+    
     gui = new hgeGUI;
     // gui->AddCtrl(new hgeGUIButton(1, 100, 520, 10, 10,));
-    HTEXTURE tex = hge->Texture_Load("data/cursor.png");
-    cursor = new hgeSprite(tex, 0, 0, 32, 32);
     this->texGui = hge->Texture_Load("data/ui.png");
+    cursor = new hgeSprite(this->texGui, 0, 120, 32, 32);
+    cursorWithCannon = new hgeSprite(this->texGui, 32, 120, 32, 32);
+    cursorWithCannon->SetHotSpot(8, 7);
     gui->AddCtrl(new hgeGUIButton(GID_BtnAddCannon, 170, 465, 50, 51, this->texGui, 0, 0));
     gui->AddCtrl(new hgeGUIButton(GID_BtnMute, 544, 503, 27, 28, this->texGui, 0, 52));
     gui->AddCtrl(new hgeGUIButton(GID_BtnPause, 514, 503, 27, 28, this->texGui, 0, 85));
+    ((hgeGUIButton*)gui->GetCtrl(GID_BtnMute))->SetMode(true);
+    ((hgeGUIButton*)gui->GetCtrl(GID_BtnPause))->SetMode(true);
 
     gui->SetCursor(cursor);
     gui->Enter();
@@ -70,20 +80,16 @@ void MainGameState::OnEnter()
 
 void MainGameState::OnLeave()
 {
+    SAFE_DELETE(bg);
+    SAFE_DELETE(cake);
+    SAFE_DELETE(gui);
+    SAFE_DELETE(cursor);
+    SAFE_DELETE(cursorWithCannon);
+    SAFE_DELETE(font);
     if (this->texGui)
     {
         hge->Texture_Free(this->texGui);
         this->texGui = 0;
-    }
-    SAFE_DELETE(bg);
-    SAFE_DELETE(cake);
-    SAFE_DELETE(gui);
-    if (cursor)
-    {
-        HTEXTURE tex = cursor->GetTexture();
-        delete cursor;
-        hge->Texture_Free(tex);
-        cursor = 0;
     }
     for (list<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
     {
@@ -100,16 +106,8 @@ void MainGameState::OnLeave()
     ants.clear();
     cannons.clear();
     bullets.clear();
-    if (animResManager)
-    {
-        delete animResManager;
-        animResManager = 0;
-    }
-    if (system)
-    {
-        delete system;
-        system = 0;
-    }
+    SAFE_DELETE(animResManager);
+    SAFE_DELETE(system);
 
     hge->Release();
     hge = 0;
@@ -133,11 +131,15 @@ void MainGameState::OnFrame()
 
     if (hge->Input_GetKeyState(HGEK_LBUTTON))
     {
-        if (!mouseLButtonDown)
+        if (!mouseLButtonDown && bAddNewCannon)
         {
             float x, y;
             hge->Input_GetMousePos(&x, &y);
-            addCannon(BaseCannon::CI_Cannon, x, y);
+            const cAni::Rect border(150 + 16, 650 - 16, 50 + 16, 448 - 16);
+            if (x > border.left && x < border.right && y > border.top && y < border.bottom)
+                addCannon(BaseCannon::CI_Cannon, x, y);
+            bAddNewCannon = false;
+            gui->SetCursor(cursor);
         }
         mouseLButtonDown = true;
     }
@@ -147,6 +149,9 @@ void MainGameState::OnFrame()
     switch(gui->Update(hge->Timer_GetDelta()))
     {
     case GID_BtnAddCannon:
+        bAddNewCannon = true;
+        gui->SetCursor(cursorWithCannon);
+        break;
     case GID_BtnPause:
         break;
     case GID_BtnMute:
@@ -193,7 +198,7 @@ void MainGameState::OnFrame()
 void MainGameState::OnRender()
 {
     hge->Gfx_BeginScene(0);
-    hge->Gfx_Clear(0xff22bb33);//ºÚÉ«±³¾°
+    hge->Gfx_Clear(ARGB(255, 0x22, 0xbb, 0x33));//ºÚÉ«±³¾°
     int time = int(60 * hge->Timer_GetTime());
     hge->Gfx_SetTransform(0, 0, 400, 300, 0, 1, 1);
     bg->render(time, 0);
@@ -213,6 +218,10 @@ void MainGameState::OnRender()
     }
     hge->Gfx_SetTransform();
     gui->Render();
+    
+    font->printf(620 - 78, 480, HGETEXT_CENTER, "%d", this->points);
+    font->printf(610, 480, HGETEXT_CENTER, "%d", this->money);
+    font->printf(640 - 14, 505, HGETEXT_CENTER, "%d", this->curAntLevel);
 
     // ÓÎÏ·×´Ì¬ÐÅÏ¢
     hge->Gfx_EndScene();
