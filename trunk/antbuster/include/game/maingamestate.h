@@ -54,6 +54,7 @@ protected:
     list<Bullet *> bullets;
     cAni::AnimResManager *animResManager;
     hgeCurvedAniSystem *system;
+    HTEXTURE texGui;
 
     int curAntLevel;
     float lastSpawnAntTime;
