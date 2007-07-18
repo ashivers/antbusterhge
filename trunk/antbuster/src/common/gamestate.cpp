@@ -77,6 +77,7 @@ void GameStateManager::RegisterState(GameState *state)
 
 void GameStateManager::RequestState(const string &name)
 {
+    assert(requestState.empty()); // already requested
     requestState = name;
 }
 
