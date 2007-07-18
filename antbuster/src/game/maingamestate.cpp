@@ -8,11 +8,10 @@
 
 #include "game/maingamestate.h"
 #include "common/entity.h"
-#include "game/bgdata.h"
 #include "entity/ant.h"
 #include "entity/bullet.h"
 #include "entity/cannon.h"
-
+#include "entity/map.h"
 
 #ifndef SAFE_DELETE
 #define SAFE_DELETE(a) if (!a);else {delete a; a = 0;}
@@ -72,18 +71,16 @@ void MainGameState::OnEnter()
     gui->SetCursor(cursor);
     gui->Enter();
 
-    bg = new cAni::Animation(2);
-    bg->setAnimData(this->animResManager->getAnimData("data/bg0.xml"), 0); // 
-    bg->setAnimData(this->animResManager->getAnimData("data/bg1.xml"), 1);
-    bg->startAnim(int(60 * hge->Timer_GetTime()), 0);
 
     cake = new cAni::Animation;
     cake->setAnimData(this->animResManager->getAnimData("data/cake.xml"), 0);
+
+    this->map = new Map(*this->animResManager);
 }
 
 void MainGameState::OnLeave()
 {
-    SAFE_DELETE(bg);
+    SAFE_DELETE(map);
     SAFE_DELETE(cake);
     SAFE_DELETE(gui);
     SAFE_DELETE(cursor);
@@ -121,6 +118,7 @@ void MainGameState::addCannon(BaseCannon::CannonId cannonid, float x, float y)
     assert(cannonid >= 0 && cannonid < BaseCannon::NumCannonId);
     BaseCannon *cannon = g_cannonData[cannonid].createInstance(*animResManager);
     cannon->setPos(hgeVector(x, y));
+    map->setOccupied(x, y);
     cannons.push_back(cannon);
 }
 
@@ -138,14 +136,12 @@ void MainGameState::OnFrame()
         {
             float x, y;
             hge->Input_GetMousePos(&x, &y);
-
-            if (x / 16 >= 0 && x / 16 < BGH_BLOCK_MAX &&
-                y / 16 >= 0 && y / 16 < BGV_BLOCK_MAX &&
-                bgData[int(x / 16)][int(y / 16)] == '1')
+            if (map->checkCannonPos(x, y))
                 addCannon(BaseCannon::CI_Cannon, x, y);
 
             bAddNewCannon = false;
             gui->SetCursor(cursor);
+            map->setShowHighLightClip(false);
         }
         mouseLButtonDown = true;
     }
@@ -157,6 +153,7 @@ void MainGameState::OnFrame()
     case GID_BtnAddCannon:
         bAddNewCannon = true;
         gui->SetCursor(cursorWithCannon);
+        map->setShowHighLightClip(true);
         break;
     case GID_BtnPause:
         break;
@@ -209,8 +206,7 @@ void MainGameState::OnRender()
     hge->Gfx_BeginScene(0);
     hge->Gfx_Clear(ARGB(255, 0x22, 0xbb, 0x33));//ºÚÉ«±³¾°
     int time = int(60 * hge->Timer_GetTime());
-    hge->Gfx_SetTransform(0, 0, 400, 300, 0, 1, 1);
-    bg->render(time, 0);
+    map->render(time);
     hge->Gfx_SetTransform(0, 0, 620, 417, 0, 1, 1);
     cake->render(time / 10, 0);
     for (list<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)

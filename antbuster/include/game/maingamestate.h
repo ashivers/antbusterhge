@@ -16,6 +16,7 @@ class Bullet;
 struct BulletData;
 class hgeFont;
 class hgeSprite;
+class Map;
 
 class MainGameState : public GameState
 {
@@ -63,8 +64,9 @@ protected:
 
     bool bAddNewCannon;
 
+    Map *map;
+
     bool mouseLButtonDown;
-    cAni::Animation *bg;
     cAni::Animation *cake;
     hgeSprite *cursor, *cursorWithCannon;
     hgeGUI *gui;
