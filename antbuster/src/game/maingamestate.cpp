@@ -162,6 +162,9 @@ void MainGameState::OnFrame()
         (*ant)->step();
         if (!(*ant)->isActive())
         {
+			points += (*ant)->getLevel();
+			money += (*ant)->getLevel();
+
             delete *ant;
             ant = ants.erase(ant);
         }
