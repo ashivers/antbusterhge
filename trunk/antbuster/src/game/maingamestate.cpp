@@ -8,13 +8,16 @@
 
 #include "game/maingamestate.h"
 #include "common/entity.h"
+#include "game/bgdata.h"
 #include "entity/ant.h"
 #include "entity/bullet.h"
 #include "entity/cannon.h"
 
+
 #ifndef SAFE_DELETE
 #define SAFE_DELETE(a) if (!a);else {delete a; a = 0;}
 #endif
+
 enum GUI_ID
 {
     GID_BtnAddCannon = 1,
@@ -135,9 +138,12 @@ void MainGameState::OnFrame()
         {
             float x, y;
             hge->Input_GetMousePos(&x, &y);
-            const cAni::Rect border(150 + 16, 650 - 16, 50 + 16, 448 - 16);
-            if (x > border.left && x < border.right && y > border.top && y < border.bottom)
+
+            if (x / 16 >= 0 && x / 16 < BGH_BLOCK_MAX &&
+                y / 16 >= 0 && y / 16 < BGV_BLOCK_MAX &&
+                bgData[int(x / 16)][int(y / 16)] == '1')
                 addCannon(BaseCannon::CI_Cannon, x, y);
+
             bAddNewCannon = false;
             gui->SetCursor(cursor);
         }
@@ -162,8 +168,8 @@ void MainGameState::OnFrame()
         (*ant)->step();
         if (!(*ant)->isActive())
         {
-			points += (*ant)->getLevel();
-			money += (*ant)->getLevel();
+            points += (*ant)->getLevel();
+            money += (*ant)->getLevel();
 
             delete *ant;
             ant = ants.erase(ant);
