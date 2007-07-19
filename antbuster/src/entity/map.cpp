@@ -19,6 +19,7 @@ Map::Map(cAni::AnimResManager &arm) : Entity(arm), bg(2), hlc(2)
     h = border.GetHeight() / 16;
     nodes = new Node[w * h];
 
+    showHlc = false;
     mouseHotPoint = hgeVector(8, 7);
 }
 Map::~Map()
@@ -38,16 +39,19 @@ void Map::render(int time)
     {
         float x, y;
         hge->Input_GetMousePos(&x, &y);
-        if (checkCannonPos(x, y))
+        if (isInMapRange(x, y))
         {
-            hlc.startAnim(0, 0);
+            if (checkCannonPos(x, y))
+            {
+                hlc.startAnim(0, 0);
+            }
+            else
+            {
+                hlc.startAnim(0, 1);
+            }
+            hge->Gfx_SetTransform(0, 0, (int)x, (int)y, 0, 1, 1);
+            hlc.render(time, 0);
         }
-        else
-        {
-            hlc.startAnim(0, 1);
-        }
-        hge->Gfx_SetTransform(0, 0, (int)x, (int)y, 0, 1, 1);
-        hlc.render(time, 0);
     }
     hge->Release();
 }
@@ -56,9 +60,17 @@ void Map::step()
 {
 
 }
-
+bool Map::isInMapRange(float x, float y) const
+{
+    x += mouseHotPoint.x;
+    y += mouseHotPoint.y;
+    return x >= border.left && x < border.right && y >= border.top && y < border.bottom;
+}
 bool Map::checkCannonPos(float &x, float &y) const
 {
+    if (!isInMapRange(x, y))
+        return false;
+
     x += mouseHotPoint.x;
     y += mouseHotPoint.y;
     int bx = (x - border.left) / 16;

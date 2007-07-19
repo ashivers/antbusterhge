@@ -16,6 +16,7 @@ public:
     virtual void step();
 
     bool checkCannonPos(float &x, float &y) const;
+    bool isInMapRange(float x, float y) const;
     void setOccupied(float x, float y);
     void setShowHighLightClip(bool show)
     {
