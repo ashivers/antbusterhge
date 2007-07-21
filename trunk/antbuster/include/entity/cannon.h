@@ -3,12 +3,12 @@
 
 #include <hgevector.h>
 #include <caAnimation.h>
-#include "common/entity.h"
+#include "common/aimentity.h"
 
 struct BulletData;
 struct CannonData;
 
-class BaseCannon : public Entity
+class BaseCannon : public AimEntity
 {
 public:
     enum CannonId

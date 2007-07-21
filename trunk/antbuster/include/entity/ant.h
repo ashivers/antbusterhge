@@ -3,12 +3,12 @@
 
 #include <hgevector.h>
 #include "caAnimation.h"
-#include "common/entity.h"
+#include "common/aimentity.h"
 
 /* @class Ant
  * @note ant
  */
-class Ant : public Entity
+class Ant : public AimEntity
 {
 public:
     enum DamageType
