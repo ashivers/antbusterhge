@@ -6,7 +6,7 @@ const cAni::Rect border(150 + 16, 650 - 16, 50 + 16, 448 - 16);
 const float dlen = 20;
 const int dMaxlen = 50;
 
-Ant::Ant(cAni::AnimResManager &arm) : Entity(arm)
+Ant::Ant(cAni::AnimResManager &arm) : AimEntity(arm)
 {
     dest.x = pos.x = float(rand() % border.GetWidth() + border.left);
     dest.y = pos.y = float(rand() % border.GetHeight() + border.top);
@@ -30,10 +30,10 @@ void Ant::initAnt(const hgeVector &spawnPos, int level)
 void Ant::render(int time)
 {
     HGE* hge = hgeCreate(HGE_VERSION);
-    hge->Gfx_SetTransform(0, 0, (int)pos.x, (int)pos.y, -angle, 1, 1);
+    hge->Gfx_SetTransform(0, 0, (float)(int)pos.x, (float)(int)pos.y, -angle, 1, 1);
     anim.render(time, 0);
-    hge->Gfx_SetTransform(0, 0, (int)pos.x, (int)pos.y, 0, 1, 1);
-    hpAnim.render(100.0f * hp / this->getMaxHp(), 0);
+    hge->Gfx_SetTransform(0, 0, (float)(int)pos.x, (float)(int)pos.y, 0, 1, 1);
+    hpAnim.render(int(100.0f * hp / this->getMaxHp()), 0);
     hge->Gfx_SetTransform();
     float alpha = (dest - pos).Length() / 50;
     DWORD color = int(255 * alpha);

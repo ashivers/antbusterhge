@@ -2,7 +2,7 @@
 #include "entity/bullet.h"
 #include "entity/ant.h"
 #include "game/maingamestate.h"
-BaseCannon::BaseCannon(cAni::AnimResManager &arm, const CannonData *_data) : Entity(arm), data(_data)
+BaseCannon::BaseCannon(cAni::AnimResManager &arm, const CannonData *_data) : AimEntity(arm), data(_data)
 {
     assert(data);
 
@@ -18,7 +18,7 @@ BaseCannon::BaseCannon(cAni::AnimResManager &arm, const CannonData *_data) : Ent
 void BaseCannon::render(int time)
 {
     HGE* hge = hgeCreate(HGE_VERSION);
-    hge->Gfx_SetTransform(0, 0, (int)pos.x, (int)pos.y, 0, 1, 1);
+    hge->Gfx_SetTransform(0, 0, (float)(int)pos.x, (float)(int)pos.y, 0, 1, 1);
     anim_base.render(time, 0);
 
     hgeVector dir = targetPos - pos;
@@ -34,7 +34,7 @@ void BaseCannon::render(int time)
     float angle = dir.Angle(&up);
     if (dir.x > 0)
         angle = -angle;
-    hge->Gfx_SetTransform(0, 0, (int)pos.x, (int)pos.y, angle, 1, 1);
+    hge->Gfx_SetTransform(0, 0, (float)(int)pos.x, (float)(int)pos.y, angle, 1, 1);
     anim_tower.render(time, 0);
     hge->Release();
 }
