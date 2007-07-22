@@ -27,10 +27,6 @@ public:
     virtual void step();
 
     void initAnt(const hgeVector &spawnPos, int level);
-    const hgeVector &getPos() const
-    {
-        return pos;
-    }
     int getHp() const
     {
         return hp;
@@ -55,7 +51,6 @@ protected:
 
     cAni::Animation anim;
     cAni::Animation hpAnim;
-    hgeVector pos;
     float angle;
 
     hgeVector dest;
