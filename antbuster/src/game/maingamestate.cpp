@@ -53,6 +53,8 @@ void MainGameState::OnEnter()
     mouseLButtonDown = hge->Input_GetKeyState(HGEK_LBUTTON);
     bAddNewCannon = false;
 
+    aimEntityHead = new AimEntity(*animResManager);
+
     font = new hgeFont("data/font.fnt");
     font->SetColor(ARGB(255, 0, 255, 0));
     
@@ -108,7 +110,8 @@ void MainGameState::OnLeave()
     bullets.clear();
     SAFE_DELETE(animResManager);
     SAFE_DELETE(system);
-
+    assert(!aimEntityHead->getNext());
+    SAFE_DELETE(aimEntityHead);
     hge->Release();
     hge = 0;
 }
@@ -121,7 +124,21 @@ void MainGameState::addCannon(BaseCannon::CannonId cannonid, float x, float y)
     map->setOccupied(x, y);
     cannons.push_back(cannon);
 }
-
+AimEntity *MainGameState::findAimedEntity(float x, float y) const
+{
+    hgeVector ap(x, y);
+    for (list<Ant *>::const_iterator ant = ants.begin(); ant != ants.end(); ++ant)
+    {
+        if (((*ant)->getPos() - ap).Length() < 10)
+            return *ant;
+    }
+    for (vector<BaseCannon *>::const_iterator cannon = cannons.begin(); cannon != cannons.end(); ++cannon)
+    {
+        if (((*cannon)->getPos() - ap).Length() < 10)
+            return *cannon;
+    }
+    return 0;
+}
 void MainGameState::OnFrame()
 {
     if (hge->Input_GetKeyState(HGEK_ESCAPE))
@@ -132,16 +149,23 @@ void MainGameState::OnFrame()
 
     if (hge->Input_GetKeyState(HGEK_LBUTTON))
     {
-        if (!mouseLButtonDown && bAddNewCannon)
+        if (!mouseLButtonDown)
         {
             float x, y;
             hge->Input_GetMousePos(&x, &y);
-            if (map->checkCannonPos(x, y))
-                addCannon(BaseCannon::CI_Cannon, x, y);
+            if (bAddNewCannon)
+            {
+                if (map->checkCannonPos(x, y))
+                    addCannon(BaseCannon::CI_Cannon, x, y);
 
-            bAddNewCannon = false;
-            gui->SetCursor(cursor);
-            map->setShowHighLightClip(false);
+                bAddNewCannon = false;
+                gui->SetCursor(cursor);
+                map->setShowHighLightClip(false);
+            }
+            else
+            {
+                this->curPick = this->findAimedEntity(x, y);
+            }
         }
         mouseLButtonDown = true;
     }
@@ -222,6 +246,10 @@ void MainGameState::OnRender()
         (*bullet)->render(time);
     }
     hge->Gfx_SetTransform();
+    if (this->curPick)
+    {
+        // this->curPick->renderAim();
+    }
     gui->Render();
     
     font->printf(620 - 78, 480, HGETEXT_CENTER, "%d", this->points);

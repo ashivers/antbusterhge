@@ -21,7 +21,7 @@ class Map;
 class MainGameState : public GameState
 {
 public:
-    MainGameState() : hge(0), animResManager(0), system(0)
+    MainGameState() : hge(0), animResManager(0), system(0), curPick(0)
     {
         assert(s_Instance == 0);
         s_Instance = this;
@@ -47,7 +47,7 @@ public:
     void getNearestAnts(vector<Ant *> &hitAnts, const hgeVector &pos, float maxRange);
 protected:
     void addCannon(BaseCannon::CannonId cannonid, float x, float y);
-
+    AimEntity *findAimedEntity(float x, float y) const;
     HGE *hge;
 
     list<Ant *> ants;
@@ -72,6 +72,9 @@ protected:
     hgeGUI *gui;
     hgeFont *font;
     static MainGameState *s_Instance;
+
+    AimEntity *aimEntityHead;
+    AimEntity *curPick;
 };
 
 #endif

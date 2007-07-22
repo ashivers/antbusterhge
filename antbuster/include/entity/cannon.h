@@ -22,10 +22,6 @@ public:
     BaseCannon(cAni::AnimResManager &arm, const CannonData *data);
     virtual void render(int time);
     virtual void step();
-    void setPos(const hgeVector &pos)
-    {
-        this->pos = pos;
-    }
 protected:
     friend struct CannonData;
     const CannonData *const data;
@@ -33,7 +29,6 @@ protected:
     cAni::Animation anim_base;
     cAni::Animation anim_tower;
 
-    hgeVector pos;
     hgeVector targetPos;
 
     float lastFireTime;
