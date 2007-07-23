@@ -46,6 +46,12 @@ protected:
 class AimEntity : public Entity, public LinkList<AimEntity>
 {
 public:
+    enum AimType
+    {
+        AT_Null,
+        AT_Ant,
+        AT_Cannon,
+    };
     AimEntity(cAni::AnimResManager &arm) : Entity(arm)
     {
     }
@@ -60,6 +66,10 @@ public:
     void setPos(const hgeVector &pos)
     {
         this->pos = pos;
+    }
+    virtual AimType getAimType() const
+    {
+        return AT_Null;
     }
 protected:
 

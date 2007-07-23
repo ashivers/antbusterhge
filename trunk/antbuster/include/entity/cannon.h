@@ -22,6 +22,10 @@ public:
     BaseCannon(cAni::AnimResManager &arm, const CannonData *data);
     virtual void render(int time);
     virtual void step();
+    virtual AimType getAimType() const
+    {
+        return AT_Cannon;
+    }
 protected:
     friend struct CannonData;
     const CannonData *const data;

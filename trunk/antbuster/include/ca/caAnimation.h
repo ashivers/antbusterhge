@@ -96,17 +96,6 @@ public:
    // void setAnimTimer(int time);
     
     void render(/*System &system, */int time, const Rect *cliprect) const;
-
-    void setPos(float x, float y)
-    {
-        m_Pos.x = x;
-        m_Pos.y = y;
-    }
-    void getPos(float &x, float &y) const
-    {
-        x = m_Pos.x;
-        y = m_Pos.y;
-    }
 protected:
     void init(AnimId animIdCount);
     const AnimData *getCurAnimData() const
@@ -119,7 +108,6 @@ protected:
     vector<const AnimData *> m_AnimDatas;
 
     int m_startTime;    // start time in game timing
-    Point2f m_Pos;      // anim position 
 
     // int m_curTime;  // current time in animation timing
     bool m_play;

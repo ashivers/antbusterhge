@@ -77,6 +77,10 @@ void MainGameState::OnEnter()
     cake = new cAni::Animation;
     cake->setAnimData(this->animResManager->getAnimData("data/cake.xml"), 0);
 
+    picker = new cAni::Animation(2);
+    picker->setAnimData(this->animResManager->getAnimData("data/pickant.xml"), 0);
+    picker->setAnimData(this->animResManager->getAnimData("data/pickcannon.xml"), 1);
+
     this->map = new Map(*this->animResManager);
 }
 
@@ -84,6 +88,7 @@ void MainGameState::OnLeave()
 {
     SAFE_DELETE(map);
     SAFE_DELETE(cake);
+    SAFE_DELETE(picker);
     SAFE_DELETE(gui);
     SAFE_DELETE(cursor);
     SAFE_DELETE(cursorWithCannon);
@@ -164,13 +169,36 @@ void MainGameState::OnFrame()
             }
             else
             {
-                this->curPick = this->findAimedEntity(x, y);
+                AimEntity *newPick = this->findAimedEntity(x, y);
+                if (newPick)
+                {
+                    this->curPick = newPick;
+                    if (this->curPick)
+                    {
+                        switch(this->curPick->getAimType())
+                        {
+                        case AimEntity::AT_Ant:
+                            this->picker->startAnim(-1, 0);
+                            break;
+                        case AimEntity::AT_Cannon:
+                            this->picker->startAnim(-1, 1);
+                            break;
+                        default:
+                            assert(0);
+                        }
+                    }
+                }
             }
         }
         mouseLButtonDown = true;
     }
     else
         mouseLButtonDown = false;
+
+    if (curPick)
+    {
+        pickerCurPos += (curPick->getPos() - pickerCurPos) * 0.1f;
+    }
 
     switch(gui->Update(hge->Timer_GetDelta()))
     {
@@ -192,6 +220,8 @@ void MainGameState::OnFrame()
             points += (*ant)->getLevel();
             money += (*ant)->getLevel();
 
+            if (this->curPick == *ant)
+                this->curPick = 0;
             delete *ant;
             ant = ants.erase(ant);
         }
@@ -245,11 +275,12 @@ void MainGameState::OnRender()
     {
         (*bullet)->render(time);
     }
-    hge->Gfx_SetTransform();
     if (this->curPick)
     {
-        // this->curPick->renderAim();
+        hge->Gfx_SetTransform(0, 0, pickerCurPos.x, pickerCurPos.y, 0, 1, 1);
+        this->picker->render(time, 0);
     }
+    hge->Gfx_SetTransform();
     gui->Render();
     
     font->printf(620 - 78, 480, HGETEXT_CENTER, "%d", this->points);

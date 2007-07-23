@@ -25,6 +25,10 @@ public:
     Ant(cAni::AnimResManager &arm);
     virtual void render(int time);
     virtual void step();
+    virtual AimType getAimType() const
+    {
+        return AT_Ant;
+    }
 
     void initAnt(const hgeVector &spawnPos, int level);
     int getHp() const
