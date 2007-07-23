@@ -21,7 +21,7 @@ class Map;
 class MainGameState : public GameState
 {
 public:
-    MainGameState() : hge(0), animResManager(0), system(0), curPick(0)
+    MainGameState() : hge(0), animResManager(0), system(0), picker(0), curPick(0)
     {
         assert(s_Instance == 0);
         s_Instance = this;
@@ -72,6 +72,9 @@ protected:
     hgeGUI *gui;
     hgeFont *font;
     static MainGameState *s_Instance;
+
+    cAni::Animation *picker;
+    hgeVector pickerCurPos;
 
     AimEntity *aimEntityHead;
     AimEntity *curPick;
