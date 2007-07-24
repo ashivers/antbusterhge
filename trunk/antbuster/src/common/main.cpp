@@ -14,6 +14,7 @@ int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
     hge->System_SetState(HGE_SCREENHEIGHT, 600);
     hge->System_SetState(HGE_SCREENBPP, 32);
     hge->System_SetState(HGE_FPS, 60);
+    hge->System_SetState(HGE_DONTSUSPEND, true);
 
 #ifdef _DEBUG
 #if HGE_VERSION >= 0x170
