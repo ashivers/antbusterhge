@@ -19,9 +19,30 @@
 
 enum GUI_ID
 {
+    /// GUI main
     GID_BtnAddCannon = 1,
     GID_BtnMute,
     GID_BtnPause,
+    GID_TxtPoints,
+    GID_TxtPointsValue,
+    GID_TxtMoney,
+    GID_TxtMoneyValue,
+    GID_TxtLevel,
+
+    /// GUI Cannon
+    GID_BtnCannonUpgradeA,
+    GID_BtnCannonUpgradeB,
+    GID_BtnCannonUpgradeC,
+    GID_BtnCannonDegrade,
+    GID_BtnCannonCancel,
+    GID_TxtCannonName,
+    // cannon info ...
+
+    /// GUI Ant
+    GID_BtnAntCancel,
+    GID_TxtAntLevel,
+    // ant info ...
+
     NumGUIId,
 };
 MainGameState *MainGameState::s_Instance = 0;
@@ -69,6 +90,18 @@ void MainGameState::OnEnter()
     gui->AddCtrl(new hgeGUIButton(GID_BtnPause, 514, 503, 27, 28, this->texGui, 0, 85));
     ((hgeGUIButton*)gui->GetCtrl(GID_BtnMute))->SetMode(true);
     ((hgeGUIButton*)gui->GetCtrl(GID_BtnPause))->SetMode(true);
+
+    // add cannon ui
+    gui->AddCtrl(new hgeGUIButton(GID_BtnCannonUpgradeA, 236, 481, 40, 40, texGui, 0, 177));
+    gui->AddCtrl(new hgeGUIButton(GID_BtnCannonUpgradeB, 236 + 40, 481, 40, 40, texGui, 0, 177));
+    gui->AddCtrl(new hgeGUIButton(GID_BtnCannonUpgradeC, 236 + 80, 481, 40, 40, texGui, 0, 177));
+    gui->AddCtrl(new hgeGUIButton(GID_BtnCannonDegrade, 236 + 120, 481, 40, 40, texGui, 0, 177));
+    gui->AddCtrl(new hgeGUIButton(GID_BtnCannonCancel, 236 + 243 , 481 + 24, 32, 32, texGui, 0, 177));
+    this->HideCannonUi();
+
+    // add ant ui
+    this->HideAntUi();
+
 
     gui->SetCursor(cursor);
     gui->Enter();
@@ -144,6 +177,37 @@ AimEntity *MainGameState::findAimedEntity(float x, float y) const
     }
     return 0;
 }
+void MainGameState::SetPick(AimEntity *newPick)
+{
+    if (newPick == 0)
+        return;
+    if (this->curPick)
+    {
+        switch(this->curPick->getAimType())
+        {
+        case AimEntity::AT_Ant:
+            this->HideAntUi();
+            break;
+        case AimEntity::AT_Cannon:
+            this->HideCannonUi();
+            break;
+        }
+    }
+    this->curPick = newPick;
+    switch(this->curPick->getAimType())
+    {
+    case AimEntity::AT_Ant:
+        this->picker->startAnim(-1, 0);
+        this->ShowAntUi();
+        break;
+    case AimEntity::AT_Cannon:
+        this->picker->startAnim(-1, 1);
+        this->ShowCannonUi();
+        break;
+    default:
+        assert(0);
+    }
+}
 void MainGameState::OnFrame()
 {
     if (hge->Input_GetKeyState(HGEK_ESCAPE))
@@ -172,21 +236,7 @@ void MainGameState::OnFrame()
                 AimEntity *newPick = this->findAimedEntity(x, y);
                 if (newPick)
                 {
-                    this->curPick = newPick;
-                    if (this->curPick)
-                    {
-                        switch(this->curPick->getAimType())
-                        {
-                        case AimEntity::AT_Ant:
-                            this->picker->startAnim(-1, 0);
-                            break;
-                        case AimEntity::AT_Cannon:
-                            this->picker->startAnim(-1, 1);
-                            break;
-                        default:
-                            assert(0);
-                        }
-                    }
+                    SetPick(newPick);
                 }
             }
         }
@@ -211,8 +261,24 @@ void MainGameState::OnFrame()
         break;
     case GID_BtnMute:
         break;
+    case GID_BtnCannonUpgradeA:
+        assert(curPick);
+        
+        break;
+    case GID_BtnCannonUpgradeB:
+        break;
+    case GID_BtnCannonUpgradeC:
+        break;
+    case GID_BtnCannonDegrade:
+        break;
+    case GID_BtnAntCancel:
+        this->HideAntUi();
+        break;
+    case GID_BtnCannonCancel:
+        this->HideCannonUi();
+        break;
     }
-    for (list<Ant *>::iterator ant = ants.begin(); ant != ants.end(); )
+    for (list<Ant *>::iterator ant = ants.begin(); ant != ants.end();)
     {
         (*ant)->step();
         if (!(*ant)->isActive())
@@ -242,7 +308,7 @@ void MainGameState::OnFrame()
     {
         (*cannon)->step();
     }
-    for (list<Bullet *>::iterator bullet = bullets.begin(); bullet != bullets.end(); )
+    for (list<Bullet *>::iterator bullet = bullets.begin(); bullet != bullets.end();)
     {
         (*bullet)->step();
         if (!(*bullet)->isActive())
@@ -253,6 +319,50 @@ void MainGameState::OnFrame()
         else
             ++bullet;
     }
+}
+
+void MainGameState::ShowCannonUi()
+{
+    if (!gui)
+        return;
+    gui->ShowCtrl(GID_BtnCannonUpgradeA, true);
+    gui->ShowCtrl(GID_BtnCannonUpgradeB, true);
+    gui->ShowCtrl(GID_BtnCannonUpgradeC, true);
+    gui->ShowCtrl(GID_BtnCannonDegrade, true);
+    gui->ShowCtrl(GID_BtnCannonCancel, true);
+}
+
+void MainGameState::HideCannonUi()
+{
+    if (!gui)
+        return;
+
+    gui->ShowCtrl(GID_BtnCannonUpgradeA, false);
+    gui->ShowCtrl(GID_BtnCannonUpgradeB, false);
+    gui->ShowCtrl(GID_BtnCannonUpgradeC, false);
+    gui->ShowCtrl(GID_BtnCannonDegrade, false);
+    gui->ShowCtrl(GID_BtnCannonCancel, false);
+    /*
+    gui->DelCtrl(GID_BtnCannonUpgradeA);
+    gui->DelCtrl(GID_BtnCannonUpgradeB);
+    gui->DelCtrl(GID_BtnCannonUpgradeC);
+    gui->DelCtrl(GID_BtnCannonDegrade);
+    gui->DelCtrl(GID_BtnCannonCancel);
+    */
+}
+
+void MainGameState::ShowAntUi()
+{
+    if (!gui)
+        return;
+
+}
+
+void MainGameState::HideAntUi()
+{
+    if (!gui)
+        return;
+
 }
 
 void MainGameState::OnRender()

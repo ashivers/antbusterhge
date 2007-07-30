@@ -74,7 +74,7 @@ bool Map::checkCannonPos(float &x, float &y) const
     x += mouseHotPoint.x;
     y += mouseHotPoint.y;
     int bx = (x - border.left) / 16;
-    int by = (y - border.top ) / 16;
+    int by = (y - border.top) / 16;
     x = bx * 16 + border.left;
     y = by * 16 + border.top ;
     if (bx >= 0 && bx < BGH_BLOCK_MAX &&
@@ -97,7 +97,7 @@ bool Map::checkCannonPos(float &x, float &y) const
 
 void Map::setOccupied(float x, float y)
 {
-    int bx = (x - border.left ) / 16;
+    int bx = (x - border.left) / 16;
     int by = (y - border.top) / 16;
     if (bx >= 0 && bx < w && by >= 0 && by < h)
     {
