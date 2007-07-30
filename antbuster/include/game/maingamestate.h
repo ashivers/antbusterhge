@@ -48,6 +48,13 @@ public:
 protected:
     void addCannon(BaseCannon::CannonId cannonid, float x, float y);
     AimEntity *findAimedEntity(float x, float y) const;
+
+    void SetPick(AimEntity *newPick);
+    void ShowCannonUi();
+    void HideCannonUi();
+    void ShowAntUi();
+    void HideAntUi();
+
     HGE *hge;
 
     list<Ant *> ants;
