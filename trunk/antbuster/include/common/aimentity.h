@@ -16,15 +16,16 @@ public:
     }
     void disconnect()
     {
+        T *tp = prev;
         if (prev)
             prev->next = next, prev = 0;
         if (next)
-            next->prev = prev, next = 0;
+            next->prev = tp, next = 0;
     }
     void insertAfter(T &n)
     {
         n.disconnect();
-        n.prev = this;
+        n.prev = (T *)this;
         n.next = next;
         if (next)
             next->prev = &n;
