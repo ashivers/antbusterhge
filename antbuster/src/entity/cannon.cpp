@@ -82,15 +82,15 @@ const cAni::AnimData *CannonData::getAd_tower() const
 */
 CannonData g_cannonData[BaseCannon::NumCannonId] = 
 {
-    //id                      parent
+    //id                      parent evolution[3]
     //   name             攻击频率      子弹          射程     炮座                   炮塔                    建造费用
-    {BaseCannon::CI_Cannon, size_t(-1),
+    {BaseCannon::CI_Cannon, size_t(-1), {BaseCannon::CI_HeavyCannon1, size_t(-1), size_t(-1),},
         "Cannon",           3.0f, Bullet::BI_CannonA, 110.0f, "data/cannon_base.xml", "data/cannon_tower.xml", -1},
-    {BaseCannon::CI_HeavyCannon1, BaseCannon::CI_Cannon,
+    {BaseCannon::CI_HeavyCannon1, BaseCannon::CI_Cannon, {BaseCannon::CI_HeavyCannon2, size_t(-1), size_t(-1),},
         "Heavy Cannon 1",   3.0f, Bullet::BI_CannonB, 120.0f, "data/cannon_base.xml", "data/cannon_tower.xml", 60},
-    {BaseCannon::CI_HeavyCannon2, BaseCannon::CI_HeavyCannon1,
+    {BaseCannon::CI_HeavyCannon2, BaseCannon::CI_HeavyCannon1, {BaseCannon::CI_HeavyCannon3, size_t(-1), size_t(-1),},
         "Heavy Cannon 2",   3.0f, Bullet::BI_CannonC, 120.0f, "data/cannon_base.xml", "data/cannon_tower.xml", 120},
-    {BaseCannon::CI_HeavyCannon3, BaseCannon::CI_HeavyCannon2,
+    {BaseCannon::CI_HeavyCannon3, BaseCannon::CI_HeavyCannon2, {size_t(-1), size_t(-1), size_t(-1),},
         "Heavy Cannon 3",   3.0f, Bullet::BI_CannonD, 120.0f, "data/cannon_base.xml", "data/cannon_tower.xml", 288},
 };
 BaseCannon *CannonData::createInstance(cAni::AnimResManager &arm) const
@@ -119,4 +119,20 @@ void CannonData::releaseInstance(BaseCannon *cannon) const
 {
     assert(cannon && cannon->data == this);
     delete cannon;
+}
+void CannonInit()
+{
+    for (size_t i = 0; i < BaseCannon::NumCannonId; i++)
+    {
+        const CannonData &cd = g_cannonData[i];
+        assert(cd.id == i);
+        for (int j = 0; j < 3; j++)
+        {
+            size_t e = cd.evolution[j];
+            if (e == size_t(-1))
+                continue;
+            assert(e < BaseCannon::NumCannonId);
+            assert(g_cannonData[e].parent == cd.id);
+        }
+    }
 }

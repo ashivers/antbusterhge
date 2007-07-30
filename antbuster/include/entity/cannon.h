@@ -41,6 +41,7 @@ struct CannonData
 {
     size_t id;
     size_t parent; // size_t(-1) 表示无祖先
+    size_t evolution[3]; // 进化的下一级，显示调用的CannonInit内根据parent检验它的正确性。
 
     string name;
     float freq; // 攻击频率
@@ -59,5 +60,5 @@ struct CannonData
 };
 
 extern CannonData g_cannonData[BaseCannon::NumCannonId];
-
+extern void CannonInit();
 #endif

@@ -62,6 +62,7 @@ void MainGameState::OnEnter()
 {
     hge = hgeCreate(HGE_VERSION);
     assert(!animResManager && !system);
+    CannonInit();
     animResManager = new cAni::AnimResManager;
     system = new hgeCurvedAniSystem;
 
@@ -161,10 +162,19 @@ void MainGameState::addCannon(BaseCannon::CannonId cannonid, float x, float y)
     cannon->setPos(hgeVector(x, y));
     map->setOccupied(x, y);
     cannons.push_back(cannon);
+    assert(aimEntityHead);
+    aimEntityHead->insertAfter(*cannon);
 }
 AimEntity *MainGameState::findAimedEntity(float x, float y) const
 {
     hgeVector ap(x, y);
+    assert(aimEntityHead);
+    for (AimEntity *ae = aimEntityHead->getNext(); ae; ae = ae->getNext())
+    {
+        if ((ae->getPos() - ap).Length() < 10)
+            return ae;
+    }
+/*
     for (list<Ant *>::const_iterator ant = ants.begin(); ant != ants.end(); ++ant)
     {
         if (((*ant)->getPos() - ap).Length() < 10)
@@ -174,7 +184,7 @@ AimEntity *MainGameState::findAimedEntity(float x, float y) const
     {
         if (((*cannon)->getPos() - ap).Length() < 10)
             return *cannon;
-    }
+    }*/
     return 0;
 }
 void MainGameState::SetPick(AimEntity *newPick)
@@ -302,6 +312,8 @@ void MainGameState::OnFrame()
             Ant *ant = new Ant(*animResManager);
             ant->initAnt(hgeVector(184, 83), this->curAntLevel++);
             ants.push_back(ant);
+            assert(aimEntityHead);
+            aimEntityHead->insertAfter(*ant);
         }
     }
     for (vector<BaseCannon *>::iterator cannon = cannons.begin(); cannon != cannons.end(); ++cannon)
