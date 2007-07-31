@@ -101,6 +101,7 @@ void MainGameState::OnEnter()
     this->HideCannonUi();
 
     // add ant ui
+    gui->AddCtrl(new hgeGUIButton(GID_BtnAntCancel, 236 + 243 , 481 + 24, 32, 32, texGui, 0, 177));
     this->HideAntUi();
 
 
@@ -165,32 +166,27 @@ void MainGameState::addCannon(BaseCannon::CannonId cannonid, float x, float y)
     assert(aimEntityHead);
     aimEntityHead->insertAfter(*cannon);
 }
+
 AimEntity *MainGameState::findAimedEntity(float x, float y) const
 {
     hgeVector ap(x, y);
     assert(aimEntityHead);
+    float minLen = 10;
+    AimEntity *minAe = 0;
     for (AimEntity *ae = aimEntityHead->getNext(); ae; ae = ae->getNext())
     {
-        if ((ae->getPos() - ap).Length() < 10)
-            return ae;
+        float len = (ae->getPos() - ap).Length();
+        if (len < minLen)
+        {
+            minLen = len;
+            minAe = ae;
+        }
     }
-/*
-    for (list<Ant *>::const_iterator ant = ants.begin(); ant != ants.end(); ++ant)
-    {
-        if (((*ant)->getPos() - ap).Length() < 10)
-            return *ant;
-    }
-    for (vector<BaseCannon *>::const_iterator cannon = cannons.begin(); cannon != cannons.end(); ++cannon)
-    {
-        if (((*cannon)->getPos() - ap).Length() < 10)
-            return *cannon;
-    }*/
-    return 0;
+    return minAe;
 }
+
 void MainGameState::SetPick(AimEntity *newPick)
 {
-    if (newPick == 0)
-        return;
     if (this->curPick)
     {
         switch(this->curPick->getAimType())
@@ -204,6 +200,8 @@ void MainGameState::SetPick(AimEntity *newPick)
         }
     }
     this->curPick = newPick;
+    if (newPick == 0)
+        return;
     switch(this->curPick->getAimType())
     {
     case AimEntity::AT_Ant:
@@ -218,6 +216,7 @@ void MainGameState::SetPick(AimEntity *newPick)
         assert(0);
     }
 }
+
 void MainGameState::OnFrame()
 {
     if (hge->Input_GetKeyState(HGEK_ESCAPE))
@@ -281,11 +280,10 @@ void MainGameState::OnFrame()
         break;
     case GID_BtnCannonDegrade:
         break;
+
     case GID_BtnAntCancel:
-        this->HideAntUi();
-        break;
     case GID_BtnCannonCancel:
-        this->HideCannonUi();
+        SetPick(0);
         break;
     }
     for (list<Ant *>::iterator ant = ants.begin(); ant != ants.end();)
@@ -335,46 +333,50 @@ void MainGameState::OnFrame()
 
 void MainGameState::ShowCannonUi()
 {
-    if (!gui)
-        return;
+    assert(gui);
+
     gui->ShowCtrl(GID_BtnCannonUpgradeA, true);
     gui->ShowCtrl(GID_BtnCannonUpgradeB, true);
     gui->ShowCtrl(GID_BtnCannonUpgradeC, true);
     gui->ShowCtrl(GID_BtnCannonDegrade, true);
     gui->ShowCtrl(GID_BtnCannonCancel, true);
+    gui->EnableCtrl(GID_BtnCannonUpgradeA, true);
+    gui->EnableCtrl(GID_BtnCannonUpgradeB, true);
+    gui->EnableCtrl(GID_BtnCannonUpgradeC, true);
+    gui->EnableCtrl(GID_BtnCannonDegrade, true);
+    gui->EnableCtrl(GID_BtnCannonCancel, true);
 }
 
 void MainGameState::HideCannonUi()
 {
-    if (!gui)
-        return;
+    assert(gui);
 
     gui->ShowCtrl(GID_BtnCannonUpgradeA, false);
     gui->ShowCtrl(GID_BtnCannonUpgradeB, false);
     gui->ShowCtrl(GID_BtnCannonUpgradeC, false);
     gui->ShowCtrl(GID_BtnCannonDegrade, false);
     gui->ShowCtrl(GID_BtnCannonCancel, false);
-    /*
-    gui->DelCtrl(GID_BtnCannonUpgradeA);
-    gui->DelCtrl(GID_BtnCannonUpgradeB);
-    gui->DelCtrl(GID_BtnCannonUpgradeC);
-    gui->DelCtrl(GID_BtnCannonDegrade);
-    gui->DelCtrl(GID_BtnCannonCancel);
-    */
+    gui->EnableCtrl(GID_BtnCannonUpgradeA, false);
+    gui->EnableCtrl(GID_BtnCannonUpgradeB, false);
+    gui->EnableCtrl(GID_BtnCannonUpgradeC, false);
+    gui->EnableCtrl(GID_BtnCannonDegrade, false);
+    gui->EnableCtrl(GID_BtnCannonCancel, false);
 }
 
 void MainGameState::ShowAntUi()
 {
-    if (!gui)
-        return;
+    assert(gui);
 
+    gui->ShowCtrl(GID_BtnAntCancel, true);
+    gui->EnableCtrl(GID_BtnAntCancel, true);
 }
 
 void MainGameState::HideAntUi()
 {
-    if (!gui)
-        return;
+    assert(gui);
 
+    gui->ShowCtrl(GID_BtnAntCancel, false);
+    gui->EnableCtrl(GID_BtnAntCancel, false);
 }
 
 void MainGameState::OnRender()
@@ -458,6 +460,7 @@ struct CmpNearestFrom
         return (a->getPos() - pos).Length() < (b->getPos() - pos).Length();
     }
 };
+
 void MainGameState::getNearestAnts(vector<Ant *> &hitAnts, const hgeVector &pos, float maxRange)
 {
     for (list<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
