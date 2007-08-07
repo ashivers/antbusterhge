@@ -13,7 +13,8 @@ class BaseCannon : public AimEntity
 public:
     enum CannonId
     {
-        CI_Cannon,
+        CI_NULL = -1,
+        CI_Cannon = 0,
         CI_HeavyCannon1,
         CI_HeavyCannon2,
         CI_HeavyCannon3,
@@ -26,6 +27,10 @@ public:
     {
         return AT_Cannon;
     }
+    // 成功升级，则返回升级后的地址，否则返回0。如果成功则需要删除原BaseCannon
+    BaseCannon *upgrade(size_t index) const;
+    // 降级，同升级
+    BaseCannon *degrade() const;
 protected:
     friend struct CannonData;
     const CannonData *const data;
@@ -39,9 +44,9 @@ protected:
 };
 struct CannonData
 {
-    size_t id;
-    size_t parent; // size_t(-1) 表示无祖先
-    size_t evolution[3]; // 进化的下一级，显示调用的CannonInit内根据parent检验它的正确性。
+    BaseCannon::CannonId id;
+    BaseCannon::CannonId parent; // -1 表示无祖先
+    BaseCannon::CannonId evolution[3]; // 进化的下一级，显示调用的CannonInit内根据parent检验它的正确性。
 
     string name;
     float freq; // 攻击频率

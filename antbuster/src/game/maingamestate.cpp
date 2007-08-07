@@ -259,7 +259,8 @@ void MainGameState::OnFrame()
         pickerCurPos += (curPick->getPos() - pickerCurPos) * 0.1f;
     }
 
-    switch(gui->Update(hge->Timer_GetDelta()))
+    int id = gui->Update(hge->Timer_GetDelta());
+    switch(id)
     {
     case GID_BtnAddCannon:
         bAddNewCannon = true;
@@ -271,14 +272,40 @@ void MainGameState::OnFrame()
     case GID_BtnMute:
         break;
     case GID_BtnCannonUpgradeA:
-        assert(curPick);
-        
-        break;
     case GID_BtnCannonUpgradeB:
-        break;
     case GID_BtnCannonUpgradeC:
+        {
+            assert(curPick);
+            assert(curPick->getAimType() == AimEntity::AT_Cannon);
+            BaseCannon *cannon = (BaseCannon *)curPick;
+            BaseCannon *newCannon = cannon->upgrade(id - GID_BtnCannonUpgradeA);
+            if (newCannon)
+            {
+                replace(this->cannons.begin(), this->cannons.end(), cannon, newCannon);
+                curPick = newCannon;
+                newCannon->setPos(cannon->getPos());
+                assert(aimEntityHead);
+                aimEntityHead->insertAfter(*newCannon);
+                delete cannon;
+            }
+        }
         break;
     case GID_BtnCannonDegrade:
+        {
+            assert(curPick);
+            assert(curPick->getAimType() == AimEntity::AT_Cannon);
+            BaseCannon *cannon = (BaseCannon *)curPick;
+            BaseCannon *newCannon = cannon->degrade();
+            if (newCannon)
+            {
+                replace(this->cannons.begin(), this->cannons.end(), cannon, newCannon);
+                curPick = newCannon;
+                newCannon->setPos(cannon->getPos());
+                assert(aimEntityHead);
+                aimEntityHead->insertAfter(*newCannon);
+                delete cannon;
+            }
+        }
         break;
 
     case GID_BtnAntCancel:
