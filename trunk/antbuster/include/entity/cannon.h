@@ -56,8 +56,8 @@ struct CannonData
 
     string ad_base;  // 底座部分（固定部分）
     string ad_tower; // 炮塔部分（可旋转的部分）
-    const cAni::AnimData *getAd_base() const; 
-    const cAni::AnimData *getAd_tower() const;
+    const cAni::AnimData *getAd_base(cAni::AnimResManager &arm) const; 
+    const cAni::AnimData *getAd_tower(cAni::AnimResManager &arm) const;
     int price; // 建造费用
 
     BaseCannon *createInstance(cAni::AnimResManager &arm) const;
