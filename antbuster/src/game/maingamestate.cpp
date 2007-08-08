@@ -303,8 +303,13 @@ void MainGameState::OnFrame()
                 newCannon->setPos(cannon->getPos());
                 assert(aimEntityHead);
                 aimEntityHead->insertAfter(*newCannon);
-                delete cannon;
             }
+            else
+            {
+                remove(this->cannons.begin(), this->cannons.end(), cannon);
+                curPick = 0;
+            }
+            delete cannon;
         }
         break;
 

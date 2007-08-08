@@ -2,6 +2,7 @@
 #include "entity/bullet.h"
 #include "entity/ant.h"
 #include "game/maingamestate.h"
+
 BaseCannon::BaseCannon(cAni::AnimResManager &arm, const CannonData *_data) : AimEntity(arm), data(_data)
 {
     assert(data);
@@ -12,9 +13,10 @@ BaseCannon::BaseCannon(cAni::AnimResManager &arm, const CannonData *_data) : Aim
     anim_tower;
     lastFireTime = 0;
 
-    anim_base.setAnimData(data->getAd_base(), 0);
-    anim_tower.setAnimData(data->getAd_tower(), 0);
+    anim_base.setAnimData(data->getAd_base(this->animResManager), 0);
+    anim_tower.setAnimData(data->getAd_tower(this->animResManager), 0);
 }
+
 void BaseCannon::render(int time)
 {
     HGE* hge = hgeCreate(HGE_VERSION);
@@ -59,6 +61,7 @@ void BaseCannon::step()
         hge->Release();
     }
 }
+
 BaseCannon *BaseCannon::upgrade(size_t index) const
 {
     assert(index < 3);
@@ -84,14 +87,14 @@ const BulletData &CannonData::getBulletData() const
     return g_bulletData[this->bulletId];
 }
 
-const cAni::AnimData *CannonData::getAd_base() const
+const cAni::AnimData *CannonData::getAd_base(cAni::AnimResManager &arm) const
 {
-    return MainGameState::GetInstance()->GetAnimResManager()->getAnimData(this->ad_base.c_str());
+    return arm.getAnimData(this->ad_base.c_str());
 }
 
-const cAni::AnimData *CannonData::getAd_tower() const
+const cAni::AnimData *CannonData::getAd_tower(cAni::AnimResManager &arm) const
 {
-    return MainGameState::GetInstance()->GetAnimResManager()->getAnimData(this->ad_tower.c_str());
+    return arm.getAnimData(this->ad_tower.c_str());
 }
 
 /*
