@@ -104,3 +104,13 @@ void Map::setOccupied(float x, float y)
         nodes[bx + by * w].occupied = true;
     }
 }
+
+void Map::clearOccupied(float x, float y)
+{
+    int bx = (x - border.left) / 16;
+    int by = (y - border.top) / 16;
+    if (bx >= 0 && bx < w && by >= 0 && by < h)
+    {
+        nodes[bx + by * w].occupied = false;
+    }
+}
