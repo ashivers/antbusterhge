@@ -14,10 +14,27 @@ public:
     enum CannonId
     {
         CI_NULL = -1,
+
         CI_Cannon = 0,
-        CI_HeavyCannon1,
-        CI_HeavyCannon2,
-        CI_HeavyCannon3,
+        CI_HeavyCannon1,        CI_HeavyCannon2, CI_HeavyCannon3,
+        CI_MissileLauncher1,    CI_MissileLauncher2,
+        CI_ImpactCannon1,       CI_ImpactCannon2,
+        CI_IceCannon1,          CI_IceCannon2,
+        CI_DoubleHeavyCannon1,  CI_DoubleHeavyCannon2,
+        CI_SonicPulse1,         CI_SonicPulse2,
+        CI_QuickCannon1,        CI_QuickCannon2, CI_QuickCannon3,
+        CI_FlameThrower1,
+        CI_SniperCanon1,        CI_SniperCanon2,
+        CI_Laser1,              CI_Laser2,
+        CI_LongRangeCannon1,    CI_LongRangeCannon2,
+        CI_EletricCannon1,      CI_EletricCannon2,
+        CI_DoubleCannon1,       CI_DoubleCannon2, CI_DoubleCannon3,
+        CI_Boomerang,
+        CI_DoubleQuickCannon1,  CI_DoubleQuickCannon2,
+        CI_MachineGun,
+        CI_TripleCannon1,       CI_TripleCannon2,
+        CI_PoisonSpray1,        CI_PoisonSpray2,
+
         NumCannonId,
     };
     BaseCannon(cAni::AnimResManager &arm, const CannonData *data);
@@ -31,6 +48,12 @@ public:
     BaseCannon *upgrade(size_t index) const;
     // 降级，同升级
     BaseCannon *degrade() const;
+
+    inline float getRange() const;
+    const CannonData &getData() const
+    {
+        return *data;
+    }
 protected:
     friend struct CannonData;
     const CannonData *const data;
@@ -42,6 +65,7 @@ protected:
 
     float lastFireTime;
 };
+
 struct CannonData
 {
     BaseCannon::CannonId id;
@@ -53,16 +77,25 @@ struct CannonData
     size_t bulletId;
     const BulletData &getBulletData() const;
     float range; // 射程
+    int price; // 建造费用
 
     string ad_base;  // 底座部分（固定部分）
     string ad_tower; // 炮塔部分（可旋转的部分）
+    string ad_button; // 升级按钮
     const cAni::AnimData *getAd_base(cAni::AnimResManager &arm) const; 
     const cAni::AnimData *getAd_tower(cAni::AnimResManager &arm) const;
-    int price; // 建造费用
+    const cAni::AnimData *getAd_button(cAni::AnimResManager &arm) const;
 
     BaseCannon *createInstance(cAni::AnimResManager &arm) const;
     void releaseInstance(BaseCannon *) const;
 };
+
+inline
+float BaseCannon::getRange() const
+{
+    assert(data);
+    return data->range;
+}
 
 extern CannonData g_cannonData[BaseCannon::NumCannonId];
 extern void CannonInit();

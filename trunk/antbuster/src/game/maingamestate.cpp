@@ -115,6 +115,13 @@ void MainGameState::OnEnter()
     picker = new cAni::Animation(2);
     picker->setAnimData(this->animResManager->getAnimData("data/pickant.xml"), 0);
     picker->setAnimData(this->animResManager->getAnimData("data/pickcannon.xml"), 1);
+    
+    range = new cAni::Animation;
+    range->setAnimData(this->animResManager->getAnimData("data/range.xml"), 0);
+
+    upgradeButton[0] = new cAni::Animation;
+    upgradeButton[1] = new cAni::Animation;
+    upgradeButton[2] = new cAni::Animation;
 
     this->map = new Map(*this->animResManager);
 }
@@ -124,6 +131,10 @@ void MainGameState::OnLeave()
     SAFE_DELETE(map);
     SAFE_DELETE(cake);
     SAFE_DELETE(picker);
+    SAFE_DELETE(range);
+    SAFE_DELETE(upgradeButton[0]);
+    SAFE_DELETE(upgradeButton[1]);
+    SAFE_DELETE(upgradeButton[2]);
     SAFE_DELETE(gui);
     SAFE_DELETE(cursor);
     SAFE_DELETE(cursorWithCannon);
@@ -282,7 +293,7 @@ void MainGameState::OnFrame()
             if (newCannon)
             {
                 replace(this->cannons.begin(), this->cannons.end(), cannon, newCannon);
-                curPick = newCannon;
+                SetPick(newCannon);
                 newCannon->setPos(cannon->getPos());
                 assert(aimEntityHead);
                 aimEntityHead->insertAfter(*newCannon);
@@ -299,15 +310,16 @@ void MainGameState::OnFrame()
             if (newCannon)
             {
                 replace(this->cannons.begin(), this->cannons.end(), cannon, newCannon);
-                curPick = newCannon;
+                SetPick(newCannon);
                 newCannon->setPos(cannon->getPos());
                 assert(aimEntityHead);
                 aimEntityHead->insertAfter(*newCannon);
             }
             else
             {
-                remove(this->cannons.begin(), this->cannons.end(), cannon);
-                curPick = 0;
+                this->cannons.erase(remove(this->cannons.begin(), this->cannons.end(), cannon), this->cannons.end());
+                SetPick(0);
+                map->clearOccupied(cannon->getPos().x, cannon->getPos().y);
             }
             delete cannon;
         }
@@ -327,7 +339,9 @@ void MainGameState::OnFrame()
             money += (*ant)->getLevel();
 
             if (this->curPick == *ant)
-                this->curPick = 0;
+            {
+                SetPick(0);
+            }
             delete *ant;
             ant = ants.erase(ant);
         }
@@ -366,16 +380,26 @@ void MainGameState::OnFrame()
 void MainGameState::ShowCannonUi()
 {
     assert(gui);
+    assert(curPick && curPick->getAimType() == AimEntity::AT_Cannon);
+    BaseCannon *cannon = (BaseCannon *) curPick;
+    const CannonData &data = cannon->getData();
 
-    gui->ShowCtrl(GID_BtnCannonUpgradeA, true);
-    gui->ShowCtrl(GID_BtnCannonUpgradeB, true);
-    gui->ShowCtrl(GID_BtnCannonUpgradeC, true);
+    for (int i = 0; i < 3; i++)
+    {
+        BaseCannon::CannonId cid = data.evolution[i];
+        if (cid != BaseCannon::CI_NULL)
+        {
+            assert(cid < BaseCannon::NumCannonId);
+            assert(upgradeButton[i]);
+            upgradeButton[i]->setAnimData(g_cannonData[cid].getAd_button(*this->animResManager), 0);
+            gui->ShowCtrl(GID_BtnCannonUpgradeA + i, true);
+            gui->EnableCtrl(GID_BtnCannonUpgradeA + i, true);
+        }
+    }
     gui->ShowCtrl(GID_BtnCannonDegrade, true);
-    gui->ShowCtrl(GID_BtnCannonCancel, true);
-    gui->EnableCtrl(GID_BtnCannonUpgradeA, true);
-    gui->EnableCtrl(GID_BtnCannonUpgradeB, true);
-    gui->EnableCtrl(GID_BtnCannonUpgradeC, true);
     gui->EnableCtrl(GID_BtnCannonDegrade, true);
+
+    gui->ShowCtrl(GID_BtnCannonCancel, true);
     gui->EnableCtrl(GID_BtnCannonCancel, true);
 }
 
@@ -398,6 +422,7 @@ void MainGameState::HideCannonUi()
 void MainGameState::ShowAntUi()
 {
     assert(gui);
+    assert(curPick && curPick->getAimType() == AimEntity::AT_Ant);
 
     gui->ShowCtrl(GID_BtnAntCancel, true);
     gui->EnableCtrl(GID_BtnAntCancel, true);
@@ -419,6 +444,14 @@ void MainGameState::OnRender()
     map->render(time);
     hge->Gfx_SetTransform(0, 0, 620, 417, 0, 1, 1);
     cake->render(time / 10, 0);
+
+    // draw range before ants and cannons
+    if (this->curPick && this->curPick->getAimType() == AimEntity::AT_Cannon)
+    {
+        BaseCannon *cannon = (BaseCannon *) this->curPick;
+        hge->Gfx_SetTransform(0, 0, cannon->getPos().x, cannon->getPos().y, 0, 1, 1);
+        this->range->render(cannon->getRange(), 0);
+    }
     for (list<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
     {
         (*ant)->render(time);
@@ -438,6 +471,16 @@ void MainGameState::OnRender()
     }
     hge->Gfx_SetTransform();
     gui->Render();
+
+    for (int i = 0; i < 3; i++)
+    {
+        hgeGUIButton *btn = (hgeGUIButton *)gui->GetCtrl(GID_BtnCannonUpgradeA + i);
+        if (btn->bVisible)
+        {
+            hge->Gfx_SetTransform(0, 0, (btn->rect.x1 + btn->rect.x2) * 0.5f, (btn->rect.y1 + btn->rect.y2) * 0.5f, 0, 1, 1);
+            this->upgradeButton[i]->render(time, 0);
+        }
+    }
     
     font->printf(620 - 78, 480, HGETEXT_CENTER, "%d", this->points);
     font->printf(610, 480, HGETEXT_CENTER, "%d", this->money);

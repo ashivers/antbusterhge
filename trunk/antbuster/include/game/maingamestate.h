@@ -81,6 +81,8 @@ protected:
     static MainGameState *s_Instance;
 
     cAni::Animation *picker;
+    cAni::Animation *range;
+    cAni::Animation *upgradeButton[3];
     hgeVector pickerCurPos;
 
     AimEntity *aimEntityHead;
