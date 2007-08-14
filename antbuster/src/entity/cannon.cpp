@@ -116,23 +116,23 @@ CannonData g_cannonData[BaseCannon::NumCannonId] =
     {
         BaseCannon::CI_Cannon,       BaseCannon::CI_NULL,         {BaseCannon::CI_HeavyCannon1, BaseCannon::CI_QuickCannon1, BaseCannon::CI_DoubleCannon1,},
         "Cannon",           3.0f, Bullet::BI_CannonA, 110.0f, -1,
-        "data/cannon/base/0.xml",
-        "data/cannon/tower/0.xml",
+        "data/cannon/base/3.xml",
+        "data/cannon/tower/10.xml",
         "data/cannon/button/0.xml",
     },
     {
-        BaseCannon::CI_HeavyCannon1, BaseCannon::CI_Cannon,       {BaseCannon::CI_HeavyCannon2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_HeavyCannon1, BaseCannon::CI_Cannon,       {BaseCannon::CI_HeavyCannon2, BaseCannon::CI_ImpactCannon1, BaseCannon::CI_DoubleHeavyCannon1,},
         "Heavy Cannon 1",   3.0f, Bullet::BI_CannonA, 120.0f, 60,
-        "data/cannon/base/1.xml",
-        "data/cannon/tower/1.xml",
-        "data/cannon/button/1.xml",
+        "data/cannon/base/4.xml",
+        "data/cannon/tower/12.xml",
+        "data/cannon/button/0.xml",
     },
     {
         BaseCannon::CI_HeavyCannon2, BaseCannon::CI_HeavyCannon1, {BaseCannon::CI_HeavyCannon3, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Heavy Cannon 2",   3.0f, Bullet::BI_CannonA, 120.0f, 120,
-        "data/cannon/base/2.xml",
+        "data/cannon/base/7.xml",
         "data/cannon/tower/2.xml",
-        "data/cannon/button/2.xml",
+        "data/cannon/button/5.xml",
     },
     {
         BaseCannon::CI_HeavyCannon3, BaseCannon::CI_HeavyCannon2, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
@@ -156,11 +156,11 @@ CannonData g_cannonData[BaseCannon::NumCannonId] =
         "data/cannon/button/3.xml",
     },
     {
-        BaseCannon::CI_ImpactCannon1, BaseCannon::CI_HeavyCannon2, {BaseCannon::CI_ImpactCannon2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_ImpactCannon1, BaseCannon::CI_HeavyCannon1, {BaseCannon::CI_ImpactCannon2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Impact Cannon 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
+        "data/cannon/base/8.xml",
         "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/button/6.xml",
     },
     {
         BaseCannon::CI_ImpactCannon2, BaseCannon::CI_ImpactCannon1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
@@ -184,11 +184,11 @@ CannonData g_cannonData[BaseCannon::NumCannonId] =
         "data/cannon/button/3.xml",
     },
     {
-        BaseCannon::CI_DoubleHeavyCannon1, BaseCannon::CI_HeavyCannon2, {BaseCannon::CI_DoubleHeavyCannon2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_DoubleHeavyCannon1, BaseCannon::CI_HeavyCannon1, {BaseCannon::CI_DoubleHeavyCannon2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Double Heavy Cannon 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
+        "data/cannon/base/9.xml",
         "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/button/7.xml",
     },
     {
         BaseCannon::CI_DoubleHeavyCannon2, BaseCannon::CI_DoubleHeavyCannon1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
@@ -214,9 +214,9 @@ CannonData g_cannonData[BaseCannon::NumCannonId] =
     {
         BaseCannon::CI_QuickCannon1, BaseCannon::CI_Cannon, {BaseCannon::CI_QuickCannon2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Quick Cannon 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
+        "data/cannon/base/5.xml",
         "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/button/1.xml",
     },
     {
         BaseCannon::CI_QuickCannon2, BaseCannon::CI_QuickCannon1, {BaseCannon::CI_QuickCannon3, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
@@ -301,9 +301,9 @@ CannonData g_cannonData[BaseCannon::NumCannonId] =
     {
         BaseCannon::CI_DoubleCannon1, BaseCannon::CI_Cannon, {BaseCannon::CI_DoubleCannon2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Double Cannon 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/6.xml",
+        "data/cannon/tower/14.xml",
+        "data/cannon/button/2.xml",
     },
     {
         BaseCannon::CI_DoubleCannon2, BaseCannon::CI_DoubleCannon1, {BaseCannon::CI_DoubleCannon3, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
