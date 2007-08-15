@@ -5,6 +5,7 @@
 #include <hgefont.h>
 #include <hgesprite.h>
 #include <hgeguictrls.h>
+#include <hgecolor.h>
 
 #include "game/maingamestate.h"
 #include "common/entity.h"
@@ -98,6 +99,10 @@ void MainGameState::OnEnter()
     gui->AddCtrl(new hgeGUIButton(GID_BtnCannonUpgradeC, 236 + 80, 481, 40, 40, texGui, 0, 177));
     gui->AddCtrl(new hgeGUIButton(GID_BtnCannonDegrade, 236 + 120, 481, 40, 40, texGui, 0, 177));
     gui->AddCtrl(new hgeGUIButton(GID_BtnCannonCancel, 236 + 243 , 481 + 24, 32, 32, texGui, 0, 177));
+    gui->AddCtrl(new hgeGUIText(GID_TxtCannonName, 236, 481 - 40, 100, 40, this->font));
+    hgeGUIText *cannonName = (hgeGUIText *)gui->GetCtrl(GID_TxtCannonName);
+    cannonName->SetColor(hgeColorRGB(0, .8, 0, 1).GetHWColor());
+    cannonName->SetMode(HGETEXT_LEFT);
     this->HideCannonUi();
 
     // add ant ui
@@ -401,6 +406,11 @@ void MainGameState::ShowCannonUi()
 
     gui->ShowCtrl(GID_BtnCannonCancel, true);
     gui->EnableCtrl(GID_BtnCannonCancel, true);
+
+    gui->ShowCtrl(GID_TxtCannonName, true);
+    hgeGUIText *cannonName = (hgeGUIText *)gui->GetCtrl(GID_TxtCannonName);
+    assert(cannonName);
+    cannonName->SetText(data.name.c_str());
 }
 
 void MainGameState::HideCannonUi()
@@ -417,6 +427,7 @@ void MainGameState::HideCannonUi()
     gui->EnableCtrl(GID_BtnCannonUpgradeC, false);
     gui->EnableCtrl(GID_BtnCannonDegrade, false);
     gui->EnableCtrl(GID_BtnCannonCancel, false);
+    gui->ShowCtrl(GID_TxtCannonName, false);
 }
 
 void MainGameState::ShowAntUi()
