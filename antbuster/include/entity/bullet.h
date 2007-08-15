@@ -16,6 +16,8 @@ public:
         BI_CannonB,
         BI_CannonC,
         BI_CannonD,
+        BI_Missile1,
+        BI_Missile2,
 
         NumBulletId,
     };

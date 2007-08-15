@@ -62,7 +62,7 @@ void MainGameState::OnEnter()
 {
     hge = hgeCreate(HGE_VERSION);
     assert(!animResManager && !system);
-    CannonInit();
+    assert(CannonInit());
     animResManager = new cAni::AnimResManager;
     system = new hgeCurvedAniSystem;
 
@@ -490,10 +490,16 @@ void MainGameState::OnRender()
     hge->Gfx_EndScene();
 }
 
-Ant *MainGameState::getTargetAnt(const hgeVector &pos)
+Ant *MainGameState::getTargetAnt(const hgeVector &pos, float maxRange)
 {
     Ant *bestAnt = 0;
-    float distance = 1e10;
+    float distance = maxRange + 1;
+    if (this->curPick && this->curPick->getAimType() == AimEntity::AT_Ant)
+    {
+        Ant *ant = (Ant *)this->curPick;
+        if ((ant->getPos() - pos).Length() <= maxRange)
+            return ant;
+    }
     for (list<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
     {
         float d = ((*ant)->getPos() - pos).Length();
@@ -503,6 +509,9 @@ Ant *MainGameState::getTargetAnt(const hgeVector &pos)
             bestAnt = *ant;
         }
     }
+    if (distance > maxRange)
+        bestAnt = 0;
+
     return bestAnt;
 }
 
