@@ -55,6 +55,7 @@ public:
         return *data;
     }
 protected:
+    virtual void fire(const hgeVector &targetPos);
     friend struct CannonData;
     const CannonData *const data;
 
@@ -65,7 +66,24 @@ protected:
 
     float lastFireTime;
 };
-
+class DoubleCannon : public BaseCannon
+{
+public:
+    DoubleCannon(cAni::AnimResManager &arm, const CannonData *data) : BaseCannon(arm, data)
+    {
+    }
+protected:
+    virtual void fire(const hgeVector &targetPos);
+};
+class TripleCannon : public BaseCannon
+{
+public:
+    TripleCannon(cAni::AnimResManager &arm, const CannonData *data) : BaseCannon(arm, data)
+    {
+    }
+protected:
+    virtual void fire(const hgeVector &targetPos);
+};
 struct CannonData
 {
     BaseCannon::CannonId id;
@@ -98,5 +116,5 @@ float BaseCannon::getRange() const
 }
 
 extern CannonData g_cannonData[BaseCannon::NumCannonId];
-extern void CannonInit();
+extern bool CannonInit();
 #endif

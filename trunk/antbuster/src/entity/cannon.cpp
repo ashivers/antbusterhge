@@ -43,23 +43,51 @@ void BaseCannon::render(int time)
 
 void BaseCannon::step()
 {
-    Ant *ant = MainGameState::GetInstance()->getTargetAnt(this->pos);
+    Ant *ant = MainGameState::GetInstance()->getTargetAnt(this->pos, this->data->range);
     if (ant)
     {
         hgeVector tp = ant->getPos();
         HGE* hge = hgeCreate(HGE_VERSION);
         float curtime = hge->Timer_GetTime();
-        if ((curtime - lastFireTime) * this->data->freq > 1 && (tp - this->pos).Length() <= this->data->range)
+        if ((curtime - lastFireTime) * this->data->freq > 1)
         {
-            this->targetPos = tp;
-            lastFireTime = curtime;
-            hgeVector dir = ant->getPos() - this->pos;
-            dir.Normalize();
-            dir *= this->data->range;
-            MainGameState::GetInstance()->fire(this->pos, dir, this->data->getBulletData());
+            this->fire(tp);
+            this->lastFireTime = curtime;
         }
         hge->Release();
     }
+}
+void BaseCannon::fire(const hgeVector &targetPos)
+{
+    this->targetPos = targetPos;
+    hgeVector dir = targetPos - this->pos;
+    dir.Normalize();
+    dir *= this->data->range;
+    MainGameState::GetInstance()->fire(this->pos, dir, this->data->getBulletData());
+}
+void DoubleCannon::fire(const hgeVector &targetPos)
+{
+    this->targetPos = targetPos;
+    hgeVector dir = targetPos - this->pos;
+    dir.Normalize();
+    dir *= this->data->range;
+    dir.Rotate(0.2);
+    MainGameState::GetInstance()->fire(this->pos, dir, this->data->getBulletData());
+    dir.Rotate(-0.4);
+    MainGameState::GetInstance()->fire(this->pos, dir, this->data->getBulletData());
+}
+
+void TripleCannon::fire(const hgeVector &targetPos)
+{
+    this->targetPos = targetPos;
+    hgeVector dir = targetPos - this->pos;
+    dir.Normalize();
+    dir *= this->data->range;
+    MainGameState::GetInstance()->fire(this->pos, dir, this->data->getBulletData());
+    dir.Rotate(0.15);
+    MainGameState::GetInstance()->fire(this->pos, dir, this->data->getBulletData());
+    dir.Rotate(-0.3);
+    MainGameState::GetInstance()->fire(this->pos, dir, this->data->getBulletData());
 }
 
 BaseCannon *BaseCannon::upgrade(size_t index) const
@@ -131,32 +159,32 @@ CannonData g_cannonData[BaseCannon::NumCannonId] =
         BaseCannon::CI_HeavyCannon2, BaseCannon::CI_HeavyCannon1, {BaseCannon::CI_HeavyCannon3, BaseCannon::CI_MissileLauncher1, BaseCannon::CI_NULL,},
         "Heavy Cannon 2",   3.0f, Bullet::BI_CannonA, 120.0f, 120,
         "data/cannon/base/7.xml",
-        "data/cannon/tower/2.xml",
+        "data/cannon/tower/3.xml",
         "data/cannon/button/5.xml",
     },
     {
         BaseCannon::CI_HeavyCannon3, BaseCannon::CI_HeavyCannon2, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Heavy Cannon 3",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/20.xml",
     },
     {
         BaseCannon::CI_MissileLauncher1, BaseCannon::CI_HeavyCannon2, {BaseCannon::CI_MissileLauncher2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
-        "Missile Launcher 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/29.xml",
-        "data/cannon/tower/3.xml",
+        "Missile Launcher 1",   3.0f, Bullet::BI_Missile1, 120.0f, 288,
+        "data/cannon/base/29.xml", //
+        "data/cannon/tower/3.xml", //
         "data/cannon/button/21.xml",
     },
     {
         BaseCannon::CI_MissileLauncher2, BaseCannon::CI_MissileLauncher1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
-        "Missile Launcher 2",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "Missile Launcher 2",   3.0f, Bullet::BI_Missile2, 120.0f, 288,
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/21.xml",
     },
     {
-        BaseCannon::CI_ImpactCannon1, BaseCannon::CI_HeavyCannon1, {BaseCannon::CI_ImpactCannon2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_ImpactCannon1, BaseCannon::CI_HeavyCannon1, {BaseCannon::CI_ImpactCannon2, BaseCannon::CI_IceCannon1, BaseCannon::CI_NULL,},
         "Impact Cannon 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
         "data/cannon/base/8.xml",
         "data/cannon/tower/3.xml",
@@ -165,26 +193,26 @@ CannonData g_cannonData[BaseCannon::NumCannonId] =
     {
         BaseCannon::CI_ImpactCannon2, BaseCannon::CI_ImpactCannon1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Impact Cannon 2",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/25.xml",
     },
     {
-        BaseCannon::CI_IceCannon1, BaseCannon::CI_HeavyCannon2, {BaseCannon::CI_IceCannon2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_IceCannon1, BaseCannon::CI_ImpactCannon1, {BaseCannon::CI_IceCannon2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Ice Cannon 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/26.xml",
     },
     {
         BaseCannon::CI_IceCannon2, BaseCannon::CI_IceCannon1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Ice Cannon 2",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/26.xml",
     },
     {
-        BaseCannon::CI_DoubleHeavyCannon1, BaseCannon::CI_HeavyCannon1, {BaseCannon::CI_DoubleHeavyCannon2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_DoubleHeavyCannon1, BaseCannon::CI_HeavyCannon1, {BaseCannon::CI_DoubleHeavyCannon2, BaseCannon::CI_SonicPulse1, BaseCannon::CI_NULL,},
         "Double Heavy Cannon 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
         "data/cannon/base/9.xml",
         "data/cannon/tower/3.xml",
@@ -193,187 +221,186 @@ CannonData g_cannonData[BaseCannon::NumCannonId] =
     {
         BaseCannon::CI_DoubleHeavyCannon2, BaseCannon::CI_DoubleHeavyCannon1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Double Heavy Cannon 2",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/22.xml",
     },
     {
-        BaseCannon::CI_SonicPulse1, BaseCannon::CI_HeavyCannon2, {BaseCannon::CI_SonicPulse2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_SonicPulse1, BaseCannon::CI_DoubleHeavyCannon1, {BaseCannon::CI_SonicPulse2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Sonic Pulse 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/27.xml",
     },
     {
         BaseCannon::CI_SonicPulse2, BaseCannon::CI_SonicPulse1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Sonic Pulse 2",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/27.xml",
     },
     {
-        BaseCannon::CI_QuickCannon1, BaseCannon::CI_Cannon, {BaseCannon::CI_QuickCannon2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_QuickCannon1, BaseCannon::CI_Cannon, {BaseCannon::CI_QuickCannon2, BaseCannon::CI_SniperCanon1, BaseCannon::CI_LongRangeCannon1,},
         "Quick Cannon 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
         "data/cannon/base/5.xml",
         "data/cannon/tower/3.xml",
         "data/cannon/button/1.xml",
     },
     {
-        BaseCannon::CI_QuickCannon2, BaseCannon::CI_QuickCannon1, {BaseCannon::CI_QuickCannon3, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_QuickCannon2, BaseCannon::CI_QuickCannon1, {BaseCannon::CI_QuickCannon3, BaseCannon::CI_FlameThrower1, BaseCannon::CI_NULL,},
         "Quick Cannon 2",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/10.xml",
     },
     {
         BaseCannon::CI_QuickCannon3, BaseCannon::CI_QuickCannon2, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Quick Cannon 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
         "data/cannon/button/3.xml",
     },
     {
-        BaseCannon::CI_FlameThrower1, BaseCannon::CI_ImpactCannon1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_FlameThrower1, BaseCannon::CI_QuickCannon2, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Flame Thrower 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/4.xml",
     },
     {
-        BaseCannon::CI_SniperCanon1, BaseCannon::CI_HeavyCannon2, {BaseCannon::CI_SniperCanon2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_SniperCanon1, BaseCannon::CI_QuickCannon1, {BaseCannon::CI_SniperCanon2, BaseCannon::CI_Laser1, BaseCannon::CI_NULL,},
         "Sniper Cannon 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/11.xml",
     },
     {
         BaseCannon::CI_SniperCanon2, BaseCannon::CI_SniperCanon1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Sniper Cannon 2",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/8.xml",
     },
     {
-        BaseCannon::CI_Laser1, BaseCannon::CI_HeavyCannon2, {BaseCannon::CI_Laser2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_Laser1, BaseCannon::CI_SniperCanon1, {BaseCannon::CI_Laser2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Laser 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/9.xml",
     },
     {
         BaseCannon::CI_Laser2, BaseCannon::CI_Laser1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Laser 2",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/9.xml",
     },
-
     {
-        BaseCannon::CI_LongRangeCannon1, BaseCannon::CI_HeavyCannon2, {BaseCannon::CI_LongRangeCannon2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_LongRangeCannon1, BaseCannon::CI_QuickCannon1, {BaseCannon::CI_LongRangeCannon2, BaseCannon::CI_EletricCannon1, BaseCannon::CI_NULL,},
         "Long Range Cannon 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/12.xml",
     },
     {
         BaseCannon::CI_LongRangeCannon2, BaseCannon::CI_LongRangeCannon1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Long Range Cannon 2",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/13.xml",
     },
 
     {
-        BaseCannon::CI_EletricCannon1, BaseCannon::CI_HeavyCannon2, {BaseCannon::CI_EletricCannon2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_EletricCannon1, BaseCannon::CI_LongRangeCannon1, {BaseCannon::CI_EletricCannon2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Eletric Cannon 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/14.xml",
     },
     {
         BaseCannon::CI_EletricCannon2, BaseCannon::CI_EletricCannon1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Eletric Cannon 2",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/14.xml",
     },
 
     {
-        BaseCannon::CI_DoubleCannon1, BaseCannon::CI_Cannon, {BaseCannon::CI_DoubleCannon2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_DoubleCannon1, BaseCannon::CI_Cannon, {BaseCannon::CI_DoubleCannon2, BaseCannon::CI_DoubleQuickCannon1, BaseCannon::CI_TripleCannon1,},
         "Double Cannon 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
         "data/cannon/base/6.xml",
         "data/cannon/tower/14.xml",
         "data/cannon/button/2.xml",
     },
     {
-        BaseCannon::CI_DoubleCannon2, BaseCannon::CI_DoubleCannon1, {BaseCannon::CI_DoubleCannon3, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_DoubleCannon2, BaseCannon::CI_DoubleCannon1, {BaseCannon::CI_DoubleCannon3, BaseCannon::CI_Boomerang, BaseCannon::CI_NULL,},
         "Double Cannon 2",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/15.xml",
     },
     {
         BaseCannon::CI_DoubleCannon3, BaseCannon::CI_DoubleCannon2, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Double Cannon 3",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/18.xml",
     },
     {
-        BaseCannon::CI_Boomerang, BaseCannon::CI_HeavyCannon2, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_Boomerang, BaseCannon::CI_DoubleCannon2, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Boomerang",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/19.xml",
     },
     {
-        BaseCannon::CI_DoubleQuickCannon1, BaseCannon::CI_HeavyCannon2, {BaseCannon::CI_DoubleQuickCannon2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_DoubleQuickCannon1, BaseCannon::CI_DoubleCannon1, {BaseCannon::CI_DoubleQuickCannon2, BaseCannon::CI_MachineGun, BaseCannon::CI_NULL,},
         "Double Quick Cannon 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/16.xml",
     },
     {
         BaseCannon::CI_DoubleQuickCannon2, BaseCannon::CI_DoubleQuickCannon1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Double Quick Cannon 2",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/23.xml",
     },
     {
-        BaseCannon::CI_MachineGun, BaseCannon::CI_ImpactCannon1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_MachineGun, BaseCannon::CI_DoubleQuickCannon1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Machine Gun",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/24.xml",
     },
     {
-        BaseCannon::CI_TripleCannon1, BaseCannon::CI_HeavyCannon2, {BaseCannon::CI_TripleCannon2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_TripleCannon1, BaseCannon::CI_DoubleCannon1, {BaseCannon::CI_TripleCannon2, BaseCannon::CI_PoisonSpray1, BaseCannon::CI_NULL,},
         "Triple Cannon 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", // 
+        "data/cannon/button/17.xml",
     },
     {
         BaseCannon::CI_TripleCannon2, BaseCannon::CI_TripleCannon1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Triple Cannon 2",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/28.xml",
     },
     {
-        BaseCannon::CI_PoisonSpray1, BaseCannon::CI_HeavyCannon2, {BaseCannon::CI_PoisonSpray2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_PoisonSpray1, BaseCannon::CI_TripleCannon1, {BaseCannon::CI_PoisonSpray2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Poison Spray 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/29.xml",
     },
     {
         BaseCannon::CI_PoisonSpray2, BaseCannon::CI_PoisonSpray1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Poison Spray 2",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
-        "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/base/3.xml", //
+        "data/cannon/tower/3.xml", //
+        "data/cannon/button/29.xml",
     },
 };
 
@@ -392,8 +419,6 @@ BaseCannon *CannonData::createInstance(cAni::AnimResManager &arm) const
     case BaseCannon::CI_ImpactCannon2:
     case BaseCannon::CI_IceCannon1:
     case BaseCannon::CI_IceCannon2:
-    case BaseCannon::CI_DoubleHeavyCannon1:
-    case BaseCannon::CI_DoubleHeavyCannon2:
     case BaseCannon::CI_SonicPulse1:
     case BaseCannon::CI_SonicPulse2:
     case BaseCannon::CI_QuickCannon1:
@@ -408,20 +433,26 @@ BaseCannon *CannonData::createInstance(cAni::AnimResManager &arm) const
     case BaseCannon::CI_LongRangeCannon2:
     case BaseCannon::CI_EletricCannon1:
     case BaseCannon::CI_EletricCannon2:
-    case BaseCannon::CI_DoubleCannon1:
-    case BaseCannon::CI_DoubleCannon2:
-    case BaseCannon::CI_DoubleCannon3:
     case BaseCannon::CI_Boomerang:
-    case BaseCannon::CI_DoubleQuickCannon1:
-    case BaseCannon::CI_DoubleQuickCannon2:
     case BaseCannon::CI_MachineGun:
-    case BaseCannon::CI_TripleCannon1:
-    case BaseCannon::CI_TripleCannon2:
     case BaseCannon::CI_PoisonSpray1:
     case BaseCannon::CI_PoisonSpray2:
         cannon = new BaseCannon(arm, this);
         break;
-    /* add new cannon like this
+    case BaseCannon::CI_DoubleHeavyCannon1:
+    case BaseCannon::CI_DoubleHeavyCannon2:
+    case BaseCannon::CI_DoubleCannon1:
+    case BaseCannon::CI_DoubleCannon2:
+    case BaseCannon::CI_DoubleCannon3:
+    case BaseCannon::CI_DoubleQuickCannon1:
+    case BaseCannon::CI_DoubleQuickCannon2:
+        cannon = new DoubleCannon(arm, this);
+        break;
+    case BaseCannon::CI_TripleCannon1:
+    case BaseCannon::CI_TripleCannon2:
+        cannon = new TripleCannon(arm, this);
+        break;
+        /* add new cannon like this
     case BaseCannon::CI_MissleLauncher:
         cannon = new MissileLauncher;
         break;
@@ -439,7 +470,7 @@ void CannonData::releaseInstance(BaseCannon *cannon) const
     delete cannon;
 }
 
-void CannonInit()
+bool CannonInit()
 {
     for (int i = 0; i < BaseCannon::NumCannonId; i++)
     {
@@ -454,4 +485,5 @@ void CannonInit()
             assert(g_cannonData[e].parent == cd.id);
         }
     }
+    return true;
 }
