@@ -128,7 +128,7 @@ CannonData g_cannonData[BaseCannon::NumCannonId] =
         "data/cannon/button/0.xml",
     },
     {
-        BaseCannon::CI_HeavyCannon2, BaseCannon::CI_HeavyCannon1, {BaseCannon::CI_HeavyCannon3, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
+        BaseCannon::CI_HeavyCannon2, BaseCannon::CI_HeavyCannon1, {BaseCannon::CI_HeavyCannon3, BaseCannon::CI_MissileLauncher1, BaseCannon::CI_NULL,},
         "Heavy Cannon 2",   3.0f, Bullet::BI_CannonA, 120.0f, 120,
         "data/cannon/base/7.xml",
         "data/cannon/tower/2.xml",
@@ -144,9 +144,9 @@ CannonData g_cannonData[BaseCannon::NumCannonId] =
     {
         BaseCannon::CI_MissileLauncher1, BaseCannon::CI_HeavyCannon2, {BaseCannon::CI_MissileLauncher2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
         "Missile Launcher 1",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
-        "data/cannon/base/3.xml",
+        "data/cannon/base/29.xml",
         "data/cannon/tower/3.xml",
-        "data/cannon/button/3.xml",
+        "data/cannon/button/21.xml",
     },
     {
         BaseCannon::CI_MissileLauncher2, BaseCannon::CI_MissileLauncher1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
