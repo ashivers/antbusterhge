@@ -15,6 +15,7 @@ BaseCannon::BaseCannon(cAni::AnimResManager &arm, const CannonData *_data) : Aim
 
     anim_base.setAnimData(data->getAd_base(this->animResManager), 0);
     anim_tower.setAnimData(data->getAd_tower(this->animResManager), 0);
+    anim_tower.setAnimLoop(false);
 }
 
 void BaseCannon::render(int time)
@@ -53,6 +54,7 @@ void BaseCannon::step()
         {
             this->fire(tp);
             this->lastFireTime = curtime;
+            anim_tower.startAnim(int(curtime * 60));
         }
         hge->Release();
     }
