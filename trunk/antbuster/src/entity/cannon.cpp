@@ -73,9 +73,9 @@ void DoubleCannon::fire(const hgeVector &targetPos)
     hgeVector dir = targetPos - this->pos;
     dir.Normalize();
     dir *= this->data->range;
-    dir.Rotate(0.2);
+    dir.Rotate(0.2f);
     MainGameState::GetInstance()->fire(this->pos, dir, this->data->getBulletData());
-    dir.Rotate(-0.4);
+    dir.Rotate(-0.4f);
     MainGameState::GetInstance()->fire(this->pos, dir, this->data->getBulletData());
 }
 
@@ -86,9 +86,9 @@ void TripleCannon::fire(const hgeVector &targetPos)
     dir.Normalize();
     dir *= this->data->range;
     MainGameState::GetInstance()->fire(this->pos, dir, this->data->getBulletData());
-    dir.Rotate(0.15);
+    dir.Rotate(0.15f);
     MainGameState::GetInstance()->fire(this->pos, dir, this->data->getBulletData());
-    dir.Rotate(-0.3);
+    dir.Rotate(-0.3f);
     MainGameState::GetInstance()->fire(this->pos, dir, this->data->getBulletData());
 }
 

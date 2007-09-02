@@ -60,6 +60,8 @@ protected:
     hgeVector dest;
 
     int damageEffect[NumDamageType];
+
+    float moveMeter; // ÒÆ¶¯Â·³Ì
 };
 
 /*

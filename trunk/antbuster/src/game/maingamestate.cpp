@@ -101,7 +101,7 @@ void MainGameState::OnEnter()
     gui->AddCtrl(new hgeGUIButton(GID_BtnCannonCancel, 236 + 243 , 481 + 24, 32, 32, texGui, 0, 177));
     gui->AddCtrl(new hgeGUIText(GID_TxtCannonName, 236, 481 - 40, 100, 40, this->font));
     hgeGUIText *cannonName = (hgeGUIText *)gui->GetCtrl(GID_TxtCannonName);
-    cannonName->SetColor(hgeColorRGB(0, .8, 0, 1).GetHWColor());
+    cannonName->SetColor(hgeColorRGB(0, .8f, 0, 1).GetHWColor());
     cannonName->SetMode(HGETEXT_LEFT);
     this->HideCannonUi();
 
@@ -461,7 +461,7 @@ void MainGameState::OnRender()
     {
         BaseCannon *cannon = (BaseCannon *) this->curPick;
         hge->Gfx_SetTransform(0, 0, cannon->getPos().x, cannon->getPos().y, 0, 1, 1);
-        this->range->render(cannon->getRange(), 0);
+        this->range->render((int) cannon->getRange(), 0);
     }
     for (list<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
     {
