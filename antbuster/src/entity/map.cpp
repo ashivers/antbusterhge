@@ -11,7 +11,7 @@ Map::Map(cAni::AnimResManager &arm) : Entity(arm), bg(2), hlc(2)
     hlc.setAnimData(this->animResManager.getAnimData("data/highlight1.xml"), 1); // ½ûÖ¹°Ú·Å
 
     HGE *hge = hgeCreate(HGE_VERSION);
-    pos = hgeVector(hge->System_GetState(HGE_SCREENWIDTH) / 2, hge->System_GetState(HGE_SCREENHEIGHT) / 2);
+    pos = hgeVector(hge->System_GetState(HGE_SCREENWIDTH) / 2.f, hge->System_GetState(HGE_SCREENHEIGHT) / 2.f);
     bg.startAnim(int(60 * hge->Timer_GetTime()), 0);
     hge->Release();
     
@@ -33,7 +33,7 @@ Map::~Map()
 void Map::render(int time)
 {
     HGE* hge = hgeCreate(HGE_VERSION);
-    hge->Gfx_SetTransform(0, 0, (int)pos.x, (int)pos.y, 0, 1, 1);
+    hge->Gfx_SetTransform(0, 0, (float)(int)pos.x, (float)(int)pos.y, 0, 1, 1);
     bg.render(time, 0);
     if (showHlc)
     {
@@ -49,7 +49,7 @@ void Map::render(int time)
             {
                 hlc.startAnim(0, 1);
             }
-            hge->Gfx_SetTransform(0, 0, (int)x, (int)y, 0, 1, 1);
+            hge->Gfx_SetTransform(0, 0, (float)(int)x, (float)(int)y, 0, 1, 1);
             hlc.render(time, 0);
         }
     }
@@ -73,10 +73,10 @@ bool Map::checkCannonPos(float &x, float &y) const
 
     x += mouseHotPoint.x;
     y += mouseHotPoint.y;
-    int bx = (x - border.left) / 16;
-    int by = (y - border.top) / 16;
-    x = bx * 16 + border.left;
-    y = by * 16 + border.top ;
+    int bx = int((x - border.left) / 16);
+    int by = int((y - border.top) / 16);
+    x = float(bx * 16 + border.left);
+    y = float(by * 16 + border.top);
     if (bx >= 0 && bx < BGH_BLOCK_MAX &&
         by >= 0 && by < BGV_BLOCK_MAX &&
         bgData[bx][by] == '1')
