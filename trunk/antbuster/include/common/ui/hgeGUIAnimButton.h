@@ -23,7 +23,7 @@ public:
 
         NumAnimId,
     };
-    void SetAnim(AnimId animId, cAni::AnimData *animData)
+    void SetAnim(AnimId animId, const cAni::AnimData *animData)
     {
         anim.setAnimData(animData, animId);
     }
