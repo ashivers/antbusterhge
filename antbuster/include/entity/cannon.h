@@ -102,7 +102,8 @@ struct CannonData
     string ad_button; // Éý¼¶°´Å¥
     const cAni::AnimData *getAd_base(cAni::AnimResManager &arm) const; 
     const cAni::AnimData *getAd_tower(cAni::AnimResManager &arm) const;
-    const cAni::AnimData *getAd_button(cAni::AnimResManager &arm) const;
+    const cAni::AnimData *getAd_buttonUp(cAni::AnimResManager &arm) const;
+    const cAni::AnimData *getAd_buttonDown(cAni::AnimResManager &arm) const;
 
     BaseCannon *createInstance(cAni::AnimResManager &arm) const;
     void releaseInstance(BaseCannon *) const;

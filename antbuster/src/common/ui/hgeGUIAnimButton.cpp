@@ -24,8 +24,9 @@ hgeGUIAnimButton::~hgeGUIAnimButton()
 void hgeGUIAnimButton::Render()
 {
     HGE *hge = hgeCreate(HGE_VERSION);
-    hge->Gfx_SetTransform(rect.x1, rect.y1);
-    anim.render();
+    hge->Gfx_SetTransform(0, 0, (rect.x1 + rect.x2) / 2, (rect.y1 + rect.y2) / 2, 0, 1, 1);
+    anim.render((int) (hge->Timer_GetTime() * 60), 0);
+    hge->Gfx_SetTransform();
     hge->Release();
 }
 

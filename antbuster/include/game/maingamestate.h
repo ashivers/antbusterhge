@@ -82,7 +82,7 @@ protected:
 
     cAni::Animation *picker;
     cAni::Animation *range;
-    cAni::Animation *upgradeButton[3];
+    //cAni::Animation *upgradeButton[3];
     hgeVector pickerCurPos;
 
     AimEntity *aimEntityHead;

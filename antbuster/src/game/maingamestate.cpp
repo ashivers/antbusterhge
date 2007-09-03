@@ -9,6 +9,7 @@
 
 #include "game/maingamestate.h"
 #include "common/entity.h"
+#include "common/ui/hgeGUIAnimButton.h"
 #include "entity/ant.h"
 #include "entity/bullet.h"
 #include "entity/cannon.h"
@@ -94,11 +95,17 @@ void MainGameState::OnEnter()
     ((hgeGUIButton*)gui->GetCtrl(GID_BtnPause))->SetMode(true);
 
     // add cannon ui
-    gui->AddCtrl(new hgeGUIButton(GID_BtnCannonUpgradeA, 236, 481, 40, 40, texGui, 0, 177));
-    gui->AddCtrl(new hgeGUIButton(GID_BtnCannonUpgradeB, 236 + 40, 481, 40, 40, texGui, 0, 177));
-    gui->AddCtrl(new hgeGUIButton(GID_BtnCannonUpgradeC, 236 + 80, 481, 40, 40, texGui, 0, 177));
+    hgeGUIAnimButton *animBtn;
+    gui->AddCtrl(animBtn = new hgeGUIAnimButton(GID_BtnCannonUpgradeA, 236, 481, 40, 40)); // ));
+    animBtn->SetMode(false);
+    gui->AddCtrl(animBtn = new hgeGUIAnimButton(GID_BtnCannonUpgradeB, 236 + 40, 481, 40, 40));
+    animBtn->SetMode(false);
+    gui->AddCtrl(animBtn = new hgeGUIAnimButton(GID_BtnCannonUpgradeC, 236 + 80, 481, 40, 40));
+    animBtn->SetMode(false);
     gui->AddCtrl(new hgeGUIButton(GID_BtnCannonDegrade, 236 + 120, 481, 40, 40, texGui, 0, 177));
+    //animBtn->SetMode(false);
     gui->AddCtrl(new hgeGUIButton(GID_BtnCannonCancel, 236 + 243 , 481 + 24, 32, 32, texGui, 0, 177));
+    //animBtn->SetMode(false);
     gui->AddCtrl(new hgeGUIText(GID_TxtCannonName, 236, 481 - 40, 100, 40, this->font));
     hgeGUIText *cannonName = (hgeGUIText *)gui->GetCtrl(GID_TxtCannonName);
     cannonName->SetColor(hgeColorRGB(0, .8f, 0, 1).GetHWColor());
@@ -123,11 +130,11 @@ void MainGameState::OnEnter()
     
     range = new cAni::Animation;
     range->setAnimData(this->animResManager->getAnimData("data/range.xml"), 0);
-
+/*
     upgradeButton[0] = new cAni::Animation;
     upgradeButton[1] = new cAni::Animation;
     upgradeButton[2] = new cAni::Animation;
-
+*/
     this->map = new Map(*this->animResManager);
 }
 
@@ -137,9 +144,11 @@ void MainGameState::OnLeave()
     SAFE_DELETE(cake);
     SAFE_DELETE(picker);
     SAFE_DELETE(range);
+    /*
     SAFE_DELETE(upgradeButton[0]);
     SAFE_DELETE(upgradeButton[1]);
     SAFE_DELETE(upgradeButton[2]);
+    */
     SAFE_DELETE(gui);
     SAFE_DELETE(cursor);
     SAFE_DELETE(cursorWithCannon);
@@ -395,8 +404,11 @@ void MainGameState::ShowCannonUi()
         if (cid != BaseCannon::CI_NULL)
         {
             assert(cid < BaseCannon::NumCannonId);
-            assert(upgradeButton[i]);
-            upgradeButton[i]->setAnimData(g_cannonData[cid].getAd_button(*this->animResManager), 0);
+            // assert(upgradeButton[i]);
+            // upgradeButton[i]->setAnimData(g_cannonData[cid].getAd_button(*this->animResManager), 0);
+            hgeGUIAnimButton *animBtn = (hgeGUIAnimButton *) gui->GetCtrl(GID_BtnCannonUpgradeA + i);
+            animBtn->SetAnim(hgeGUIAnimButton::ButtonUp, g_cannonData[cid].getAd_buttonUp(*this->animResManager));
+            animBtn->SetAnim(hgeGUIAnimButton::ButtonDown, g_cannonData[cid].getAd_buttonDown(*this->animResManager));
             gui->ShowCtrl(GID_BtnCannonUpgradeA + i, true);
             gui->EnableCtrl(GID_BtnCannonUpgradeA + i, true);
         }
@@ -482,17 +494,17 @@ void MainGameState::OnRender()
     }
     hge->Gfx_SetTransform();
     gui->Render();
-
+/*
     for (int i = 0; i < 3; i++)
     {
         hgeGUIButton *btn = (hgeGUIButton *)gui->GetCtrl(GID_BtnCannonUpgradeA + i);
         if (btn->bVisible)
         {
             hge->Gfx_SetTransform(0, 0, (btn->rect.x1 + btn->rect.x2) * 0.5f, (btn->rect.y1 + btn->rect.y2) * 0.5f, 0, 1, 1);
-            this->upgradeButton[i]->render(time, 0);
+            // this->upgradeButton[i]->render(time, 0);
         }
     }
-    
+*/    
     font->printf(620 - 78, 480, HGETEXT_CENTER, "%d", this->points);
     font->printf(610, 480, HGETEXT_CENTER, "%d", this->money);
     font->printf(640 - 14, 505, HGETEXT_CENTER, "%d", this->curAntLevel);
