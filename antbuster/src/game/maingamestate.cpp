@@ -1,6 +1,7 @@
 #include <cmath>
 #include <cassert>
 #include <cctype>
+#include <algorithm>
 
 #include <hgefont.h>
 #include <hgesprite.h>
@@ -14,6 +15,8 @@
 #include "entity/bullet.h"
 #include "entity/cannon.h"
 #include "entity/map.h"
+
+using namespace std;
 
 #ifndef SAFE_DELETE
 #define SAFE_DELETE(a) if (!a);else {delete a; a = 0;}
@@ -65,8 +68,8 @@ void MainGameState::OnEnter()
     hge = hgeCreate(HGE_VERSION);
     assert(!animResManager && !system);
     assert(CannonInit());
-    animResManager = new cAni::AnimResManager;
     system = new hgeCurvedAniSystem;
+    animResManager = iSystem::GetInstance()->createAnimResManager();
 
     curAntLevel = 1;
     points = 0;
@@ -121,20 +124,16 @@ void MainGameState::OnEnter()
     gui->Enter();
 
 
-    cake = new cAni::Animation;
+    cake = iSystem::GetInstance()->createAnimation();
     cake->setAnimData(this->animResManager->getAnimData("data/cake.xml"), 0);
 
-    picker = new cAni::Animation(2);
+    picker = iSystem::GetInstance()->createAnimation(2);
     picker->setAnimData(this->animResManager->getAnimData("data/pickant.xml"), 0);
     picker->setAnimData(this->animResManager->getAnimData("data/pickcannon.xml"), 1);
     
-    range = new cAni::Animation;
+    range = iSystem::GetInstance()->createAnimation();
     range->setAnimData(this->animResManager->getAnimData("data/range.xml"), 0);
-/*
-    upgradeButton[0] = new cAni::Animation;
-    upgradeButton[1] = new cAni::Animation;
-    upgradeButton[2] = new cAni::Animation;
-*/
+
     this->map = new Map(*this->animResManager);
 }
 
@@ -144,11 +143,6 @@ void MainGameState::OnLeave()
     SAFE_DELETE(cake);
     SAFE_DELETE(picker);
     SAFE_DELETE(range);
-    /*
-    SAFE_DELETE(upgradeButton[0]);
-    SAFE_DELETE(upgradeButton[1]);
-    SAFE_DELETE(upgradeButton[2]);
-    */
     SAFE_DELETE(gui);
     SAFE_DELETE(cursor);
     SAFE_DELETE(cursorWithCannon);

@@ -10,7 +10,7 @@ using namespace std;
 class Entity
 {
 public:
-    Entity(cAni::AnimResManager &arm) : animResManager(arm), active(true)
+    Entity(cAni::iAnimResManager &arm) : animResManager(arm), active(true)
     {
     }
     virtual void render(int time)
@@ -26,7 +26,7 @@ public:
         return active;
     }
 protected:
-    cAni::AnimResManager &animResManager;
+    cAni::iAnimResManager &animResManager;
 
     bool active;
 private:

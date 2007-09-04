@@ -1,11 +1,18 @@
 #include "entity/bullet.h"
 #include "entity/ant.h"
 #include "game/maingamestate.h"
-Bullet::Bullet(cAni::AnimResManager &arm, const BulletData *_data) : Entity(arm), data(_data)
+Bullet::Bullet(cAni::iAnimResManager &arm, const BulletData *_data) : Entity(arm), data(_data)
 {
-    anim.setAnimData(data->getAd_move(), 0);
-    anim.startAnim(0, 0);
+    anim = iSystem::GetInstance()->createAnimation();
+    anim->setAnimData(data->getAd_move(), 0);
+    anim->startAnim(0, 0);
 }
+
+Bullet::~Bullet()
+{
+    iSystem::GetInstance()->release(anim);
+}
+
 void Bullet::setTarget(Ant &ant)
 {
     this->target = ant.getPos();
@@ -27,7 +34,7 @@ void Bullet::render(int time)
     if (dir.x > 0)
         angle = -angle;
     hge->Gfx_SetTransform(0, 0, pos.x, pos.y, angle, 1, 1);
-    anim.render(time, 0);
+    anim->render(time, 0);
 
     hge->Release();
 }
@@ -92,7 +99,7 @@ const cAni::AnimData *BulletData::getAd_explode() const // 爆炸
     return ad_explode.empty() ? 0 : MainGameState::GetInstance()->GetAnimResManager()->getAnimData(ad_explode.c_str());
 }
 
-Bullet *BulletData::createInstance(cAni::AnimResManager &arm) const// 生成一个新的本类型子弹
+Bullet *BulletData::createInstance(cAni::iAnimResManager &arm) const// 生成一个新的本类型子弹
 {
     Bullet *bullet = 0;
     switch(this->bulletId)

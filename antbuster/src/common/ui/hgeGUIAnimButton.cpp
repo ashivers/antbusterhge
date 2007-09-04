@@ -4,9 +4,9 @@
 ** hgeGUIAnimButton
 */
 
-hgeGUIAnimButton::hgeGUIAnimButton(int _id, float x, float y, float w, float h) :
-    anim(NumAnimId)
+hgeGUIAnimButton::hgeGUIAnimButton(int _id, float x, float y, float w, float h)
 {
+    anim = iSystem::GetInstance()->createAnimation(NumAnimId);
 	id = _id;
 	bStatic = false;
 	bVisible = true;
@@ -19,13 +19,14 @@ hgeGUIAnimButton::hgeGUIAnimButton(int _id, float x, float y, float w, float h) 
 
 hgeGUIAnimButton::~hgeGUIAnimButton()
 {
+    iSystem::GetInstance()->release(anim);
 }
 
 void hgeGUIAnimButton::Render()
 {
     HGE *hge = hgeCreate(HGE_VERSION);
     hge->Gfx_SetTransform(0, 0, (rect.x1 + rect.x2) / 2, (rect.y1 + rect.y2) / 2, 0, 1, 1);
-    anim.render((int) (hge->Timer_GetTime() * 60), 0);
+    anim->render((int) (hge->Timer_GetTime() * 60), 0);
     hge->Gfx_SetTransform();
     hge->Release();
 }
@@ -36,7 +37,7 @@ bool hgeGUIAnimButton::MouseLButton(bool bDown)
 	{
 		bOldState = bPressed;
         bPressed = true;
-        anim.startAnim(0, bTrigger && bOldState ? TriggedDown : ButtonDown);
+        anim->startAnim(0, bTrigger && bOldState ? TriggedDown : ButtonDown);
 		return false;
 	}
 	else
@@ -44,12 +45,12 @@ bool hgeGUIAnimButton::MouseLButton(bool bDown)
 		if (bTrigger)
         {
             bPressed = !bOldState;
-            anim.startAnim(0, bPressed ? TriggedDown : TriggedUp);
+            anim->startAnim(0, bPressed ? TriggedDown : TriggedUp);
         }
 		else 
         {
             bPressed = false;
-            anim.startAnim(0, ButtonUp);
+            anim->startAnim(0, ButtonUp);
         }
 		return true; 
 	}

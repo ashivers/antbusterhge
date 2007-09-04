@@ -2,7 +2,7 @@
 #define MAP_H
 
 #include <hgevector.h>
-#include "caAnimation.h"
+#include <hgeCurvedAni.h>
 #include "common/entity.h"
 
 using namespace std;
@@ -10,7 +10,7 @@ using namespace std;
 class Map : public Entity
 {
 public:
-    Map(cAni::AnimResManager &arm);
+    Map(cAni::iAnimResManager &arm);
     virtual ~Map();
     virtual void render(int time);
     virtual void step();
@@ -26,8 +26,8 @@ public:
 protected:
 
     hgeVector pos;
-    cAni::Animation bg;
-    cAni::Animation hlc;
+    cAni::iAnimation *bg;
+    cAni::iAnimation *hlc;
     bool showHlc;
 
     struct Node

@@ -1,9 +1,9 @@
 #ifndef HGEGUIANIMBUTTON_H
 #define HGEGUIANIMBUTTON_H
 
-
+#include <cassert>
 #include "hgeguictrls.h"
-#include "caAnimation.h"
+#include <hgeCurvedAni.h>
 
 /*
 ** hgeGUIAnimButton
@@ -25,7 +25,8 @@ public:
     };
     void SetAnim(AnimId animId, const cAni::AnimData *animData)
     {
-        anim.setAnimData(animData, animId);
+        assert(anim);
+        anim->setAnimData(animData, animId);
     }
 
 	void			SetMode(bool _bTrigger) { bTrigger=_bTrigger; }
@@ -39,7 +40,7 @@ private:
 	bool			bTrigger;
 	bool			bPressed;
 	bool			bOldState;
-    cAni::Animation anim;
+    cAni::iAnimation *anim;
 };
 
 #endif

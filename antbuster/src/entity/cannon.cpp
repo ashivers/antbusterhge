@@ -3,26 +3,33 @@
 #include "entity/ant.h"
 #include "game/maingamestate.h"
 
-BaseCannon::BaseCannon(cAni::AnimResManager &arm, const CannonData *_data) : AimEntity(arm), data(_data)
+BaseCannon::BaseCannon(cAni::iAnimResManager &arm, const CannonData *_data) : AimEntity(arm), data(_data)
 {
     assert(data);
-
     pos;
     targetPos;
     anim_base;
     anim_tower;
     lastFireTime = 0;
 
-    anim_base.setAnimData(data->getAd_base(this->animResManager), 0);
-    anim_tower.setAnimData(data->getAd_tower(this->animResManager), 0);
-    anim_tower.setAnimLoop(false);
+    anim_base = iSystem::GetInstance()->createAnimation();
+    anim_base->setAnimData(data->getAd_base(this->animResManager), 0);
+    anim_tower = iSystem::GetInstance()->createAnimation();
+    anim_tower->setAnimData(data->getAd_tower(this->animResManager), 0);
+    anim_tower->setAnimLoop(false);
+}
+
+BaseCannon::~BaseCannon()
+{
+    iSystem::GetInstance()->release(anim_base);
+    iSystem::GetInstance()->release(anim_tower);
 }
 
 void BaseCannon::render(int time)
 {
     HGE* hge = hgeCreate(HGE_VERSION);
     hge->Gfx_SetTransform(0, 0, (float)(int)pos.x, (float)(int)pos.y, 0, 1, 1);
-    anim_base.render(time, 0);
+    anim_base->render(time, 0);
 
     hgeVector dir = targetPos - pos;
     hgeVector up(0, -1);
@@ -38,7 +45,7 @@ void BaseCannon::render(int time)
     if (dir.x > 0)
         angle = -angle;
     hge->Gfx_SetTransform(0, 0, (float)(int)pos.x, (float)(int)pos.y, angle, 1, 1);
-    anim_tower.render(time, 0);
+    anim_tower->render(time, 0);
     hge->Release();
 }
 
@@ -54,7 +61,7 @@ void BaseCannon::step()
         {
             this->fire(tp);
             this->lastFireTime = curtime;
-            anim_tower.startAnim(int(curtime * 60));
+            anim_tower->startAnim(int(curtime * 60));
         }
         hge->Release();
     }
@@ -117,22 +124,22 @@ const BulletData &CannonData::getBulletData() const
     return g_bulletData[this->bulletId];
 }
 
-const cAni::AnimData *CannonData::getAd_base(cAni::AnimResManager &arm) const
+const cAni::AnimData *CannonData::getAd_base(cAni::iAnimResManager &arm) const
 {
     return arm.getAnimData((this->ad_base + ".xml").c_str());
 }
 
-const cAni::AnimData *CannonData::getAd_tower(cAni::AnimResManager &arm) const
+const cAni::AnimData *CannonData::getAd_tower(cAni::iAnimResManager &arm) const
 {
     return arm.getAnimData((this->ad_tower + ".xml").c_str());
 }
 
-const cAni::AnimData *CannonData::getAd_buttonUp(cAni::AnimResManager &arm) const
+const cAni::AnimData *CannonData::getAd_buttonUp(cAni::iAnimResManager &arm) const
 {
     return arm.getAnimData((this->ad_button + "_up.xml").c_str());
 }
 
-const cAni::AnimData *CannonData::getAd_buttonDown(cAni::AnimResManager &arm) const
+const cAni::AnimData *CannonData::getAd_buttonDown(cAni::iAnimResManager &arm) const
 {
     return arm.getAnimData((this->ad_button + "_down.xml").c_str());
 }
@@ -410,7 +417,7 @@ CannonData g_cannonData[BaseCannon::NumCannonId] =
     },
 };
 
-BaseCannon *CannonData::createInstance(cAni::AnimResManager &arm) const
+BaseCannon *CannonData::createInstance(cAni::iAnimResManager &arm) const
 {
     BaseCannon *cannon = 0;
     switch(this->id)

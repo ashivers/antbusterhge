@@ -2,7 +2,7 @@
 #define BULLET_H
 
 #include <hgeVector.h>
-#include <caAnimation.h>
+#include <hgeCurvedAni.h>
 #include "common/entity.h"
 
 struct BulletData;
@@ -21,7 +21,8 @@ public:
 
         NumBulletId,
     };
-    Bullet(cAni::AnimResManager &arm, const BulletData *data);
+    Bullet(cAni::iAnimResManager &arm, const BulletData *data);
+    virtual ~Bullet();
     virtual void render(int time);
     virtual void step();
 
@@ -34,7 +35,7 @@ public:
         this->target = target;
     }
     virtual void setTarget(Ant &ant);
-    cAni::Animation anim;
+    cAni::iAnimation *anim;
 
     const BulletData * const data;
     hgeVector pos;
@@ -44,7 +45,7 @@ public:
 class Missile : public Bullet
 {
 public:
-    Missile(cAni::AnimResManager &arm, const BulletData *data) : Bullet(arm, data), targetAnt(0)
+    Missile(cAni::iAnimResManager &arm, const BulletData *data) : Bullet(arm, data), targetAnt(0)
     {
     }
     virtual void step();
@@ -65,7 +66,7 @@ struct BulletData
     const cAni::AnimData *getAd_fire() const;  // 发射
     const cAni::AnimData *getAd_move() const;  // 飞行
     const cAni::AnimData *getAd_explode() const; // 爆炸
-    Bullet *createInstance(cAni::AnimResManager &arm) const; // 生成一个新的本类型子弹
+    Bullet *createInstance(cAni::iAnimResManager &arm) const; // 生成一个新的本类型子弹
     void releaseInstance(Bullet *bullet) const; // 释放该子弹
     void applyDamage(Ant &ant) const;
 };

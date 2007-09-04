@@ -2,7 +2,7 @@
 #define CANNON_H
 
 #include <hgevector.h>
-#include <caAnimation.h>
+#include <hgeCurvedAni.h>
 #include "common/aimentity.h"
 
 struct BulletData;
@@ -37,7 +37,8 @@ public:
 
         NumCannonId,
     };
-    BaseCannon(cAni::AnimResManager &arm, const CannonData *data);
+    BaseCannon(cAni::iAnimResManager &arm, const CannonData *data);
+    virtual ~BaseCannon();
     virtual void render(int time);
     virtual void step();
     virtual AimType getAimType() const
@@ -59,8 +60,8 @@ protected:
     friend struct CannonData;
     const CannonData *const data;
 
-    cAni::Animation anim_base;
-    cAni::Animation anim_tower;
+    cAni::iAnimation *anim_base;
+    cAni::iAnimation *anim_tower;
 
     hgeVector targetPos;
 
@@ -69,7 +70,7 @@ protected:
 class DoubleCannon : public BaseCannon
 {
 public:
-    DoubleCannon(cAni::AnimResManager &arm, const CannonData *data) : BaseCannon(arm, data)
+    DoubleCannon(cAni::iAnimResManager &arm, const CannonData *data) : BaseCannon(arm, data)
     {
     }
 protected:
@@ -78,7 +79,7 @@ protected:
 class TripleCannon : public BaseCannon
 {
 public:
-    TripleCannon(cAni::AnimResManager &arm, const CannonData *data) : BaseCannon(arm, data)
+    TripleCannon(cAni::iAnimResManager &arm, const CannonData *data) : BaseCannon(arm, data)
     {
     }
 protected:
@@ -100,12 +101,12 @@ struct CannonData
     string ad_base;  // 底座部分（固定部分）
     string ad_tower; // 炮塔部分（可旋转的部分）
     string ad_button; // 升级按钮
-    const cAni::AnimData *getAd_base(cAni::AnimResManager &arm) const; 
-    const cAni::AnimData *getAd_tower(cAni::AnimResManager &arm) const;
-    const cAni::AnimData *getAd_buttonUp(cAni::AnimResManager &arm) const;
-    const cAni::AnimData *getAd_buttonDown(cAni::AnimResManager &arm) const;
+    const cAni::AnimData *getAd_base(cAni::iAnimResManager &arm) const; 
+    const cAni::AnimData *getAd_tower(cAni::iAnimResManager &arm) const;
+    const cAni::AnimData *getAd_buttonUp(cAni::iAnimResManager &arm) const;
+    const cAni::AnimData *getAd_buttonDown(cAni::iAnimResManager &arm) const;
 
-    BaseCannon *createInstance(cAni::AnimResManager &arm) const;
+    BaseCannon *createInstance(cAni::iAnimResManager &arm) const;
     void releaseInstance(BaseCannon *) const;
 };
 

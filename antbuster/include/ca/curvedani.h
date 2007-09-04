@@ -2,6 +2,8 @@
 #define CANI_CURVED_ANI
 
 #include <cassert>
+#include "caRect.h"
+
 class TiXmlElement;
 namespace cAni
 {
@@ -103,6 +105,29 @@ namespace cAni
     public:
         virtual void render(const iClipState &cs) = 0;
     };
+    class AnimData;
+    class iAnimation
+    {
+    public:
+        typedef size_t AnimId;
+        enum
+        {
+            DefaultAnimId = ~0,
+        };
+        virtual void setAnimData(const AnimData *pAnimData, AnimId aniId) = 0;
+        virtual bool startAnim(int curtime, AnimId aniId = DefaultAnimId) = 0;
+        virtual bool checkEnd(int curtime) const = 0;
+        virtual void setAnimLoop(bool bLoop) = 0;
+        virtual AnimId getCurAnim() const = 0;
+        // void setAnimTimer(int time);
+
+        virtual void render(/*System &system, */int time, const Rect *cliprect) const = 0;
+    };
+    class iAnimResManager
+    {
+    public:
+        virtual const AnimData* getAnimData(const char *aniFileName) = 0;
+    };
     class iSystem
     {
     public:
@@ -116,6 +141,8 @@ namespace cAni
         virtual iBitStream *loadStream(const char *name) = 0;
         virtual iCurveDataSet *createCurveDataSet(const char *name) = 0;
         virtual iCurveInterpolater *createCurveInterpolater(const char *name) = 0;
+        iAnimation *createAnimation(size_t animCount = 1);
+        iAnimResManager *createAnimResManager();
         iClipState *getClipState()
         {
             if (!cs)
@@ -127,6 +154,8 @@ namespace cAni
         virtual void release(iBitStream *bs) = 0;
         virtual void release(iCurveDataSet *cds) = 0;
         virtual void release(iCurveInterpolater *ci) = 0;
+        void release(iAnimation *a);
+        void release(iAnimResManager *arm);
         virtual iRenderer *getRenderer() = 0;
         virtual float getTime() = 0;
 

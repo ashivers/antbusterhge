@@ -3,16 +3,18 @@
 
 const cAni::Rect border(150 + 16, 650 - 16, 50 + 16, 448 - 16);
 
-Map::Map(cAni::AnimResManager &arm) : Entity(arm), bg(2), hlc(2)
+Map::Map(cAni::iAnimResManager &arm) : Entity(arm)
 {
-    bg.setAnimData(this->animResManager.getAnimData("data/bg0.xml"), 0); // 
-    bg.setAnimData(this->animResManager.getAnimData("data/bg1.xml"), 1);
-    hlc.setAnimData(this->animResManager.getAnimData("data/highlight0.xml"), 0); // 可以安放
-    hlc.setAnimData(this->animResManager.getAnimData("data/highlight1.xml"), 1); // 禁止摆放
+    bg = iSystem::GetInstance()->createAnimation(2);
+    bg->setAnimData(this->animResManager.getAnimData("data/bg0.xml"), 0); // 
+    bg->setAnimData(this->animResManager.getAnimData("data/bg1.xml"), 1);
+    hlc = iSystem::GetInstance()->createAnimation(2);
+    hlc->setAnimData(this->animResManager.getAnimData("data/highlight0.xml"), 0); // 可以安放
+    hlc->setAnimData(this->animResManager.getAnimData("data/highlight1.xml"), 1); // 禁止摆放
 
     HGE *hge = hgeCreate(HGE_VERSION);
     pos = hgeVector(hge->System_GetState(HGE_SCREENWIDTH) / 2.f, hge->System_GetState(HGE_SCREENHEIGHT) / 2.f);
-    bg.startAnim(int(60 * hge->Timer_GetTime()), 0);
+    bg->startAnim(int(60 * hge->Timer_GetTime()), 0);
     hge->Release();
     
     w = border.GetWidth() / 16;
@@ -29,12 +31,14 @@ Map::~Map()
         delete [] nodes;
         nodes = 0;
     }
+    iSystem::GetInstance()->release(bg);
+    iSystem::GetInstance()->release(hlc);
 }
 void Map::render(int time)
 {
     HGE* hge = hgeCreate(HGE_VERSION);
     hge->Gfx_SetTransform(0, 0, (float)(int)pos.x, (float)(int)pos.y, 0, 1, 1);
-    bg.render(time, 0);
+    bg->render(time, 0);
     if (showHlc)
     {
         float x, y;
@@ -43,14 +47,14 @@ void Map::render(int time)
         {
             if (checkCannonPos(x, y))
             {
-                hlc.startAnim(0, 0);
+                hlc->startAnim(0, 0);
             }
             else
             {
-                hlc.startAnim(0, 1);
+                hlc->startAnim(0, 1);
             }
             hge->Gfx_SetTransform(0, 0, (float)(int)x, (float)(int)y, 0, 1, 1);
-            hlc.render(time, 0);
+            hlc->render(time, 0);
         }
     }
     hge->Release();
