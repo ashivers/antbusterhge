@@ -53,7 +53,7 @@ public:
         AT_Ant,
         AT_Cannon,
     };
-    AimEntity(cAni::AnimResManager &arm) : Entity(arm)
+    AimEntity(cAni::iAnimResManager &arm) : Entity(arm)
     {
     }
     virtual void renderInfo(int time)

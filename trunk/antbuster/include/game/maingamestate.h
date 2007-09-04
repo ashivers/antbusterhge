@@ -4,7 +4,6 @@
 #include <list>
 
 #include <hgegui.h>
-#include <caAnimation.h>
 #include <hgeCurvedAni.h>
 #include "common/gamestate.h"
 #include "entity/cannon.h"
@@ -37,7 +36,7 @@ public:
     {
         return s_Instance;
     }
-    cAni::AnimResManager *GetAnimResManager()
+    cAni::iAnimResManager *GetAnimResManager()
     {
         return animResManager;
     }
@@ -60,7 +59,7 @@ protected:
     list<Ant *> ants;
     vector<BaseCannon *> cannons;
     list<Bullet *> bullets;
-    cAni::AnimResManager *animResManager;
+    cAni::iAnimResManager *animResManager;
     hgeCurvedAniSystem *system;
     HTEXTURE texGui;
 
@@ -74,15 +73,14 @@ protected:
     Map *map;
 
     bool mouseLButtonDown;
-    cAni::Animation *cake;
+    cAni::iAnimation *cake;
     hgeSprite *cursor, *cursorWithCannon;
     hgeGUI *gui;
     hgeFont *font;
     static MainGameState *s_Instance;
 
-    cAni::Animation *picker;
-    cAni::Animation *range;
-    //cAni::Animation *upgradeButton[3];
+    cAni::iAnimation *picker;
+    cAni::iAnimation *range;
     hgeVector pickerCurPos;
 
     AimEntity *aimEntityHead;

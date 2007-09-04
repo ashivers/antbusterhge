@@ -2,7 +2,7 @@
 #define ANT_H
 
 #include <hgevector.h>
-#include "caAnimation.h"
+#include <hgeCurvedAni.h>
 #include "common/aimentity.h"
 
 /* @class Ant
@@ -22,7 +22,8 @@ public:
         NumDamageType,
     };
 
-    Ant(cAni::AnimResManager &arm);
+    Ant(cAni::iAnimResManager &arm);
+    virtual ~Ant();
     virtual void render(int time);
     virtual void step();
     virtual AimType getAimType() const
@@ -53,8 +54,8 @@ protected:
     int hp;
     int level;
 
-    cAni::Animation anim;
-    cAni::Animation hpAnim;
+    cAni::iAnimation *anim;
+    cAni::iAnimation *hpAnim;
     float angle;
 
     hgeVector dest;
