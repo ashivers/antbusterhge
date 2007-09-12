@@ -4,7 +4,7 @@
 	</DataSet>
 	<DataSet name="CDS_HGE_Float2" numData="3">
 		<Data time="0" value="0,0" />
-		<Data time="5" value="0,5" />
+		<Data time="5" value="0,1" />
 		<Data time="20" value="0,0" />
 	</DataSet>
 	<Interpolater name="CI_HGE_StepImage" />

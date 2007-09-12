@@ -85,6 +85,15 @@ public:
 protected:
     virtual void fire(const hgeVector &targetPos);
 };
+class MachineGun : public BaseCannon
+{
+public:
+    MachineGun(cAni::iAnimResManager &arm, const CannonData *data) : BaseCannon(arm, data)
+    {
+    }
+protected:
+    virtual void fire(const hgeVector &targetPos);
+};
 struct CannonData
 {
     BaseCannon::CannonId id;
