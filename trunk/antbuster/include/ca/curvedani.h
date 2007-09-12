@@ -7,8 +7,8 @@
 class TiXmlElement;
 namespace cAni
 {
-    /// 实现下列接口
-    /// 纹理提供者
+    /// implement the following interfaces in your renderer
+
     class iTexture
     {
     public:
@@ -105,7 +105,9 @@ namespace cAni
     public:
         virtual void render(const iClipState &cs) = 0;
     };
+
     class AnimData;
+    /// NO need to implement this interface
     class iAnimation
     {
     public:
@@ -123,10 +125,13 @@ namespace cAni
 
         virtual void render(/*System &system, */int time, const Rect *cliprect) const = 0;
     };
+    /// NO need to implement this interface
     class iAnimResManager
     {
     public:
         virtual const AnimData* getAnimData(const char *aniFileName) = 0;
+        virtual bool saveToBitStream(const AnimData *pAnimData, iBitStream *bs) const = 0;
+        virtual bool saveToXml(const AnimData *pAnimData, const char *filename) const = 0;
     };
     class iSystem
     {
@@ -173,7 +178,6 @@ namespace cAni
         void *texmap;
         mutable iClipState *cs;
     };
-
 }
 
 #endif // CANI_CURVED_ANI

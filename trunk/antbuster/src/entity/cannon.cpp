@@ -99,6 +99,16 @@ void TripleCannon::fire(const hgeVector &targetPos)
     MainGameState::GetInstance()->fire(this->pos, dir, this->data->getBulletData());
 }
 
+void MachineGun::fire(const hgeVector &targetPos)
+{
+    this->targetPos = targetPos;
+    hgeVector dir = targetPos - this->pos;
+    dir.Normalize();
+    dir *= this->data->range;
+    dir.Rotate(((float) rand() / RAND_MAX - 0.5) * 0.5);
+    MainGameState::GetInstance()->fire(this->pos, dir, this->data->getBulletData());
+}
+
 BaseCannon *BaseCannon::upgrade(size_t index) const
 {
     assert(index < 3);
@@ -382,9 +392,9 @@ CannonData g_cannonData[BaseCannon::NumCannonId] =
     },
     {
         BaseCannon::CI_MachineGun, BaseCannon::CI_DoubleQuickCannon1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
-        "Machine Gun",   3.0f, Bullet::BI_CannonA, 120.0f, 288,
+        "Machine Gun",   12.0f, Bullet::BI_CannonA, 120.0f, 288,
         "data/cannon/base/3", //
-        "data/cannon/tower/3", //
+        "data/cannon/tower/20",
         "data/cannon/button/24",
     },
     {
@@ -447,7 +457,6 @@ BaseCannon *CannonData::createInstance(cAni::iAnimResManager &arm) const
     case BaseCannon::CI_EletricCannon1:
     case BaseCannon::CI_EletricCannon2:
     case BaseCannon::CI_Boomerang:
-    case BaseCannon::CI_MachineGun:
     case BaseCannon::CI_PoisonSpray1:
     case BaseCannon::CI_PoisonSpray2:
         cannon = new BaseCannon(arm, this);
@@ -464,6 +473,9 @@ BaseCannon *CannonData::createInstance(cAni::iAnimResManager &arm) const
     case BaseCannon::CI_TripleCannon1:
     case BaseCannon::CI_TripleCannon2:
         cannon = new TripleCannon(arm, this);
+        break;
+    case BaseCannon::CI_MachineGun:
+        cannon = new MachineGun(arm, this);
         break;
         /* add new cannon like this
     case BaseCannon::CI_MissleLauncher:

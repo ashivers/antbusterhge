@@ -54,7 +54,7 @@ void Bullet::step()
         pos += dir;
 
         vector<Ant *> hitAnts;
-        MainGameState::GetInstance()->getNearestAnts(hitAnts, this->pos, 16.0f);
+        MainGameState::GetInstance()->getNearestAnts(hitAnts, this->pos, 10.0f);
         if (!hitAnts.empty())
         {
             this->data->applyDamage(*hitAnts.front());
