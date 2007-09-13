@@ -76,6 +76,9 @@ void MainGameState::OnEnter()
     money = 200;
 	restCake = 8;
 
+    antLairPos = hgeVector(184, 83);
+    cakePos = hgeVector(620, 417);
+
     lastSpawnAntTime = hge->Timer_GetTime();
 
     mouseLButtonDown = hge->Input_GetKeyState(HGEK_LBUTTON);
@@ -367,7 +370,7 @@ void MainGameState::OnFrame()
         {
             lastSpawnAntTime = hge->Timer_GetTime();
             Ant *ant = new Ant(*animResManager);
-            ant->initAnt(hgeVector(184, 83), this->curAntLevel++);
+            ant->initAnt(this->getAntLairPos(), this->curAntLevel++);
             ants.push_back(ant);
             assert(aimEntityHead);
             aimEntityHead->insertAfter(*ant);
@@ -388,6 +391,28 @@ void MainGameState::OnFrame()
         else
             ++bullet;
     }
+}
+
+bool MainGameState::getCake(const hgeVector &pos)
+{
+    if (this->restCake == 0)
+        return false;
+
+    if ((pos - this->cakePos).Length() > 25)
+        return false;
+
+    --this->restCake;
+    return true;
+}
+
+// 蚂蚁送蛋糕到蚁穴，如果送达，返回true
+bool MainGameState::putCake(const hgeVector &pos)
+{
+    assert(this->restCake < 8); // 肯定已经被取走蛋糕了
+    if ((pos - this->antLairPos).Length() > 25)
+        return false;
+
+    return true;
 }
 
 void MainGameState::ShowCannonUi()
@@ -462,7 +487,7 @@ void MainGameState::OnRender()
     hge->Gfx_Clear(ARGB(255, 0x22, 0xbb, 0x33));//黑色背景
     int time = int(60 * hge->Timer_GetTime());
     map->render(time);
-    hge->Gfx_SetTransform(0, 0, 620, 417, 0, 1, 1);
+    hge->Gfx_SetTransform(0, 0, cakePos.x, cakePos.y, 0, 1, 1);
     cake->render(restCake, 0);
 
     // draw range before ants and cannons

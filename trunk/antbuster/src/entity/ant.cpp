@@ -1,6 +1,7 @@
 #include <hge.h>
 #include "caRect.h"
 #include "entity/ant.h"
+#include "game/maingamestate.h"
 
 const cAni::Rect border(150 + 16, 650 - 16, 50 + 16, 448 - 16);
 const float dlen = 20;
@@ -8,20 +9,20 @@ const int dMaxlen = 50;
 
 Ant::Ant(cAni::iAnimResManager &arm) : AimEntity(arm), moveMeter(0), carryCake(false)
 {
-    dest.x = pos.x = float(rand() % border.GetWidth() + border.left);
-    dest.y = pos.y = float(rand() % border.GetHeight() + border.top);
-    angle = (float)rand() / RAND_MAX * 3.1415926f;
+    this->dest.x = this->pos.x = float(rand() % border.GetWidth() + border.left);
+    this->dest.y = this->pos.y = float(rand() % border.GetHeight() + border.top);
+    this->angle = (float)rand() / RAND_MAX * 3.1415926f;
     this->level = 1;
     this->hp = this->getMaxHp();
     this->refCount = 0;
-    memset(damageEffect, 0, sizeof(damageEffect));
+    memset(this->damageEffect, 0, sizeof(this->damageEffect));
 
-    anim = iSystem::GetInstance()->createAnimation();
-    anim->setAnimData(animResManager.getAnimData("data/ant.xml"), 0);
-    hpAnim = iSystem::GetInstance()->createAnimation();
-    hpAnim->setAnimData(animResManager.getAnimData("data/anthp.xml"), 0);
-	cakeAnim = iSystem::GetInstance()->createAnimation();
-	cakeAnim->setAnimData(animResManager.getAnimData("data/antcake.xml"), 0);
+    this->anim = iSystem::GetInstance()->createAnimation();
+    this->anim->setAnimData(animResManager.getAnimData("data/ant.xml"), 0);
+    this->hpAnim = iSystem::GetInstance()->createAnimation();
+    this->hpAnim->setAnimData(animResManager.getAnimData("data/anthp.xml"), 0);
+	this->cakeAnim = iSystem::GetInstance()->createAnimation();
+	this->cakeAnim->setAnimData(animResManager.getAnimData("data/antcake.xml"), 0);
 }
 
 Ant::~Ant()
@@ -36,7 +37,7 @@ void Ant::initAnt(const hgeVector &spawnPos, int level)
     this->dest = this->pos = spawnPos;
     this->level = level;
     this->hp = this->getMaxHp();
-    memset(damageEffect, 0, sizeof(damageEffect));
+    memset(this->damageEffect, 0, sizeof(this->damageEffect));
 }
 
 void Ant::render(int time)
@@ -44,20 +45,21 @@ void Ant::render(int time)
     time;
 
     HGE* hge = hgeCreate(HGE_VERSION);
-    hge->Gfx_SetTransform(0, 0, (float)(int)pos.x, (float)(int)pos.y, -angle, 1, 1);
-	anim->render((int) moveMeter, 0);
-	if (carryCake)
+    hge->Gfx_SetTransform(0, 0, (float)(int) this->pos.x, (float)(int) this->pos.y, -this->angle, 1, 1);
+	this->anim->render((int) this->moveMeter, 0);
+	if (this->carryCake)
 	{
-		cakeAnim->render(time, 0);
+		this->cakeAnim->render(time, 0);
 	}
-    hge->Gfx_SetTransform(0, 0, (float)(int)pos.x, (float)(int)pos.y, 0, 1, 1);
-    hpAnim->render(int(100.0f * hp / this->getMaxHp()), 0);
+    hge->Gfx_SetTransform(0, 0, (float)(int) this->pos.x, (float)(int) this->pos.y, 0, 1, 1);
+    this->hpAnim->render(int(100.0f * this->hp / this->getMaxHp()), 0);
     hge->Gfx_SetTransform();
     float alpha = (dest - pos).Length() / 50;
     DWORD color = int(255 * alpha);
-    if (color > 255) color = 255;
-    color = color<<24 | 0xffffff;
-    hge->Gfx_RenderLine(pos.x, pos.y, dest.x, dest.y, color);
+    if (color > 255)
+        color = 255;
+    color = color << 24 | 0xffffff;
+    hge->Gfx_RenderLine(this->pos.x, this->pos.y, this->dest.x, this->dest.y, color);
 	
     hge->Release();
 }
@@ -70,33 +72,34 @@ void Ant::applyDamage(DamageType damageType, int damage)
 }
 void Ant::applyDamageEffect()
 {
-    hp -= damageEffect[DT_Normal]; // 普通攻击
-    damageEffect[DT_Normal] = 0;   // 立即生效
+    this->hp -= this->damageEffect[DT_Normal]; // 普通攻击
+    this->damageEffect[DT_Normal] = 0;   // 立即生效
 
-    hp -= damageEffect[DT_Impact]; // 冲击
-    damageEffect[DT_Impact] /= 2;  // 有衰减的效果
+    this->hp -= this->damageEffect[DT_Impact]; // 冲击
+    this->damageEffect[DT_Impact] /= 2;  // 有衰减的效果
 
-    if (damageEffect[DT_Frozen] > 0) // 冰冻
-        hp--, damageEffect[DT_Frozen]--; 
+    if (this->damageEffect[DT_Frozen] > 0) // 冰冻
+        this->hp--, this->damageEffect[DT_Frozen]--; 
 
-    if (damageEffect[DT_Fire] > 0) // 火焰
-        hp--, damageEffect[DT_Fire]--; 
+    if (this->damageEffect[DT_Fire] > 0) // 火焰
+        this->hp--, this->damageEffect[DT_Fire]--; 
 
-    if (damageEffect[DT_Poison] > 0) // 中毒
-        hp--, damageEffect[DT_Poison]--; 
+    if (this->damageEffect[DT_Poison] > 0) // 中毒
+        this->hp--, this->damageEffect[DT_Poison]--; 
 
-    if (hp < 0)
+    if (this->hp < 0)
     {
-        hp = 0;
-        active = false;
+        this->hp = 0;
+        this->active = false;
     }
 }
 
 float Ant::getSpeed() const
 {
     float speed = 1.2f;
-    // if (cake) speed = 1.0f;
-    speed -= 0.1f * damageEffect[DT_Frozen];
+    if (this->carryCake)
+        speed = 1.0f;
+    speed -= 0.1f * this->damageEffect[DT_Frozen];
     if (speed < 0.3f)
         speed = 0.3f;
     return speed;
@@ -104,39 +107,99 @@ float Ant::getSpeed() const
 
 void Ant::step()
 {
-    if ((dest - pos).Length() < dlen)
+    if ((this->dest - this->pos).Length() < dlen * 0.1f)
     {
+#if 0
         int dx = rand() % (dMaxlen * 2 + 1) - dMaxlen;
         int dy = rand() % (dMaxlen * 2 + 1) - dMaxlen;
         if (dx > 0) dx += (int)dlen; else dx -= (int)dlen;
         if (dy > 0) dy += (int)dlen; else dy -= (int)dlen;
-        dest = hgeVector(pos.x + dx, pos.y + dy);
-        if (dest.x < border.left)
-            dest.x = border.left;
-        if (dest.x > border.right)
-            dest.x = border.right;
-        if (dest.y < border.top)
-            dest.y = border.top;
-        if (dest.y > border.bottom)
-            dest.y = border.bottom;
+        this->dest = hgeVector(pos.x + dx, pos.y + dy);
+#else
+        int x = int((pos.x - border.left) / dlen + 0.5) * dlen + border.left;
+        int y = int((pos.y - border.top) / dlen + 0.5) * dlen + border.top;
+        hgeVector curDestPos = this->carryCake ? MainGameState::GetInstance()->getAntLairPos() : MainGameState::GetInstance()->getCakePos();
+        //curDestPos.x > x
+        if (rand() % 3)
+        {
+            int r = rand() % 3;
+            if (r & 1)
+            {
+                if (curDestPos.x > x)
+                    x += dlen;
+                else if (curDestPos.x < x)
+                    x -= dlen;
+            }
+            if (r & 2)
+            {
+                if (curDestPos.y > y)
+                    y += dlen;
+                else if (curDestPos.y < y)
+                    y -= dlen;
+            }
+        }
+        else
+        {
+            int r = rand() % 8;
+            if (r >= 4) r ++;
+            if (r % 3 == 0)
+                x -= dlen;
+            else if (r % 3 == 2)
+                x += dlen;
+            if (r / 3 == 0)
+                y -= dlen;
+            else if (r / 3 == 2)
+                y += dlen;
+        }
+        this->dest = hgeVector(x, y);
+#endif
+        if (this->dest.x < border.left)
+            this->dest.x = border.left;
+        if (this->dest.x > border.right)
+            this->dest.x = border.right;
+        if (this->dest.y < border.top)
+            this->dest.y = border.top;
+        if (this->dest.y > border.bottom)
+            this->dest.y = border.bottom;
+    }
+
+    if (this->carryCake)
+    {
+        // 有蛋糕，送回蚁穴
+        if (MainGameState::GetInstance()->putCake(this->pos))
+        {
+            this->carryCake = false;
+        }
+    }
+    else
+    {
+        // 取得蛋糕
+        if (MainGameState::GetInstance()->getCake(this->pos))
+        {
+            this->carryCake = true;
+            this->hp = min(this->getMaxHp(), this->getMaxHp() / 2 + this->hp);
+        }
     }
 
     hgeVector curdir(0, -1);
-    hgeVector oldPos = pos; 
-    curdir.Rotate(angle);
-    hgeVector destdir = *(dest - pos).Normalize();
-    float offangle = curdir.x * destdir.y - curdir.y * destdir.x;
-    angle += offangle * 0.05f;
-    pos += curdir * getSpeed() * (1 - 2 * sqrt(abs(offangle)));
-    if (pos.x < border.left)
-        pos.x = border.left;
-    if (pos.x > border.right)
-        pos.x = border.right;
-    if (pos.y < border.top)
-        pos.y = border.top;
-    if (pos.y > border.bottom)
-        pos.y = border.bottom;
+    hgeVector oldPos = this->pos; 
+    curdir.Rotate(this->angle);
+    hgeVector destdir = *(this->dest - this->pos).Normalize();
+    float offangle = curdir.Angle(&destdir);
+    if (curdir.x * destdir.y - curdir.y * destdir.x < 0)
+        offangle = -offangle;
+    this->angle += offangle * 0.05f;
+    this->pos += curdir * this->getSpeed() * min(1, 0.1 / abs(offangle));// * (1 - 2 * sqrt(abs(offangle)));
 
-    moveMeter += (oldPos - pos).Length();
-    applyDamageEffect();
+    if (this->pos.x < border.left)
+        this->pos.x = border.left;
+    if (this->pos.x > border.right)
+        this->pos.x = border.right;
+    if (this->pos.y < border.top)
+        this->pos.y = border.top;
+    if (this->pos.y > border.bottom)
+        this->pos.y = border.bottom;
+
+    this->moveMeter += (oldPos - this->pos).Length();
+    this->applyDamageEffect();
 }

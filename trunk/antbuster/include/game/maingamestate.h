@@ -44,6 +44,20 @@ public:
     void fire(const hgeVector &pos, Ant &targetAnt, const BulletData &bulletData);
     void fire(const hgeVector &pos, const hgeVector &targetDirection, const BulletData &bulletData);
     void getNearestAnts(vector<Ant *> &hitAnts, const hgeVector &pos, float maxRange);
+
+    // 蚂蚁拿蛋糕，如果拿到，返回true
+    bool getCake(const hgeVector &pos);
+    // 蚂蚁送蛋糕到蚁穴，如果送达，返回true
+    bool putCake(const hgeVector &pos);
+    
+    const hgeVector &getCakePos() const
+    {
+        return cakePos;
+    }
+    const hgeVector &getAntLairPos() const
+    {
+        return antLairPos;
+    }
 protected:
     void addCannon(BaseCannon::CannonId cannonid, float x, float y);
     AimEntity *findAimedEntity(float x, float y) const;
@@ -68,6 +82,9 @@ protected:
     int curAntLevel;
     float lastSpawnAntTime;
 	int restCake; // 余下的蛋糕数量
+    
+    hgeVector antLairPos;
+    hgeVector cakePos;
 
     bool bAddNewCannon;
 
