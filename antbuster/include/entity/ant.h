@@ -56,6 +56,7 @@ protected:
 
     cAni::iAnimation *anim;
     cAni::iAnimation *hpAnim;
+	cAni::iAnimation *cakeAnim;
     float angle;
 
     hgeVector dest;
@@ -63,6 +64,8 @@ protected:
     int damageEffect[NumDamageType];
 
     float moveMeter; // 移动路程
+
+	bool carryCake; // 是否携带蛋糕
 };
 
 /*
