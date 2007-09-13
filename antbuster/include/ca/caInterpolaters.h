@@ -44,7 +44,7 @@ namespace cAni
             while(lo + 1 < hi)
             {
                 size_t id = lo + hi >> 1;
-                if (cds.getTime(id) < time)
+                if (cds.getTime(id) <= time)
                     lo = id;
                 else
                     hi = id;
@@ -82,7 +82,7 @@ namespace cAni
             while(lo + 1 < hi)
             {
                 size_t id = lo + hi >> 1;
-                if (cds.getTime(id) < time)
+                if (cds.getTime(id) <= time)
                     lo = id;
                 else
                     hi = id;
@@ -127,7 +127,7 @@ namespace cAni
                 while(lo + 1 < hi)
                 {
                     size_t id = lo + hi >> 1;
-                    if (cds.getTime(id) < time)
+                    if (cds.getTime(id) <= time)
                         lo = id;
                     else
                         hi = id;
