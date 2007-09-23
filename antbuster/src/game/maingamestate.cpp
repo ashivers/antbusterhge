@@ -138,6 +138,9 @@ void MainGameState::OnEnter()
     range = iSystem::GetInstance()->createAnimation();
     range->setAnimData(this->animResManager->getAnimData("data/range.xml"), 0);
 
+    singleCake = iSystem::GetInstance()->createAnimation();
+    singleCake->setAnimData(this->animResManager->getAnimData("data/singlecake.xml"), 0);
+
     this->map = new Map(*this->animResManager);
 }
 
@@ -147,6 +150,7 @@ void MainGameState::OnLeave()
     SAFE_DELETE(cake);
     SAFE_DELETE(picker);
     SAFE_DELETE(range);
+    SAFE_DELETE(singleCake);
     SAFE_DELETE(gui);
     SAFE_DELETE(cursor);
     SAFE_DELETE(cursorWithCannon);
@@ -358,6 +362,10 @@ void MainGameState::OnFrame()
             {
                 SetPick(0);
             }
+            if ((*ant)->hasCake())
+            {
+                this->cakeBack.push_back((*ant)->getPos());
+            }
             delete *ant;
             ant = ants.erase(ant);
         }
@@ -390,6 +398,19 @@ void MainGameState::OnFrame()
         }
         else
             ++bullet;
+    }
+    assert(this->restCake + cakeBack.size() <= 8);
+    for (vector<hgeVector>::iterator cake = cakeBack.begin(); cake != cakeBack.end();)
+    {
+        *cake = getCakePos() * 0.1 + *cake * 0.9;
+        if ((*cake - getCakePos()).Length() < 16)
+        {
+            cake = cakeBack.erase(cake);
+            assert(this->restCake < 8);
+            this->restCake++;
+        }
+        else
+            ++cake;
     }
 }
 
@@ -508,6 +529,11 @@ void MainGameState::OnRender()
     for (list<Bullet *>::iterator bullet = bullets.begin(); bullet != bullets.end(); ++bullet)
     {
         (*bullet)->render(time);
+    }
+    for (vector<hgeVector>::const_iterator cake = cakeBack.begin(); cake != cakeBack.end(); ++cake)
+    {
+        hge->Gfx_SetTransform(0, 0, cake->x, cake->y, 0, 1, 1);
+        this->singleCake->render(time, 0);
     }
     if (this->curPick)
     {

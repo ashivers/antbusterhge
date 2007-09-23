@@ -48,6 +48,10 @@ public:
     void applyDamage(DamageType damageType, int damage);
     int refCount; // do not delete the ant if refCount is not 0, this is used by missile like bullets
 
+    bool hasCake() const
+    {
+        return carryCake;
+    }
 protected:
     void applyDamageEffect();
 
