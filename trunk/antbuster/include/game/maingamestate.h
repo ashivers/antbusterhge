@@ -73,6 +73,7 @@ protected:
     list<Ant *> ants;
     vector<BaseCannon *> cannons;
     list<Bullet *> bullets;
+    vector<hgeVector> cakeBack;
     cAni::iAnimResManager *animResManager;
     hgeCurvedAniSystem *system;
     HTEXTURE texGui;
@@ -99,6 +100,7 @@ protected:
 
     cAni::iAnimation *picker;
     cAni::iAnimation *range;
+    cAni::iAnimation *singleCake;
     hgeVector pickerCurPos;
 
     AimEntity *aimEntityHead;
