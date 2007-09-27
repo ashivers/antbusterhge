@@ -30,6 +30,7 @@ Ant::~Ant()
     iSystem::GetInstance()->release(anim);
 	iSystem::GetInstance()->release(hpAnim);
 	iSystem::GetInstance()->release(cakeAnim);
+    assert(refCount == 0);
 }
 
 void Ant::initAnt(const hgeVector &spawnPos, int level)
@@ -105,7 +106,7 @@ float Ant::getSpeed() const
     return speed;
 }
 
-void Ant::step()
+void Ant::step(float deltaTime)
 {
     if ((this->dest - this->pos).Length() < dlen * 0.1f)
     {
@@ -189,7 +190,7 @@ void Ant::step()
     if (curdir.x * destdir.y - curdir.y * destdir.x < 0)
         offangle = -offangle;
     this->angle += offangle * 0.05f;
-    this->pos += curdir * this->getSpeed() * min(1, 0.1 / abs(offangle));// * (1 - 2 * sqrt(abs(offangle)));
+    this->pos += 60 * deltaTime * curdir * this->getSpeed() * min(1, 0.1 / abs(offangle));// * (1 - 2 * sqrt(abs(offangle)));
 
     if (this->pos.x < border.left)
         this->pos.x = border.left;

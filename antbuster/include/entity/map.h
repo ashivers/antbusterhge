@@ -13,7 +13,7 @@ public:
     Map(cAni::iAnimResManager &arm);
     virtual ~Map();
     virtual void render(int time);
-    virtual void step();
+    virtual void step(float deltaTime);
 
     bool checkCannonPos(float &x, float &y) const;
     bool isInMapRange(float x, float y) const;

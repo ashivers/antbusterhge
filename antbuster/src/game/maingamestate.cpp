@@ -160,10 +160,6 @@ void MainGameState::OnLeave()
         hge->Texture_Free(this->texGui);
         this->texGui = 0;
     }
-    for (list<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
-    {
-        delete *ant;
-    }
     for (vector<BaseCannon *>::iterator cannon = cannons.begin(); cannon != cannons.end(); ++cannon)
     {
         delete *cannon;
@@ -171,6 +167,10 @@ void MainGameState::OnLeave()
     for (list<Bullet *>::iterator bullet = bullets.begin(); bullet != bullets.end(); ++bullet)
     {
         delete *bullet;
+    }
+    for (list<Ant *>::iterator ant = ants.begin(); ant != ants.end(); ++ant)
+    {
+        delete *ant;
     }
     ants.clear();
     cannons.clear();
@@ -246,6 +246,7 @@ void MainGameState::SetPick(AimEntity *newPick)
 
 void MainGameState::OnFrame()
 {
+    const float deltaTime = hge->Timer_GetDelta();
     if (hge->Input_GetKeyState(HGEK_ESCAPE))
     {
         // RequestState("mainmenu");
@@ -286,7 +287,7 @@ void MainGameState::OnFrame()
         pickerCurPos += (curPick->getPos() - pickerCurPos) * 0.1f;
     }
 
-    int id = gui->Update(hge->Timer_GetDelta());
+    int id = gui->Update(deltaTime);
     switch(id)
     {
     case GID_BtnAddCannon:
@@ -350,9 +351,20 @@ void MainGameState::OnFrame()
         SetPick(0);
         break;
     }
-    for (list<Ant *>::iterator ant = ants.begin(); ant != ants.end();)
+    list<Ant *>::iterator ant;
+    for (ant = antsDelList.begin(); ant != antsDelList.end();)
     {
-        (*ant)->step();
+        if ((*ant)->refCount == 0)
+        {
+            delete *ant;
+            ant = antsDelList.erase(ant);
+        }
+        else
+            ++ant;
+    }
+    for (ant = ants.begin(); ant != ants.end();)
+    {
+        (*ant)->step(deltaTime);
         if (!(*ant)->isActive())
         {
             points += (*ant)->getLevel();
@@ -366,7 +378,10 @@ void MainGameState::OnFrame()
             {
                 this->cakeBack.push_back((*ant)->getPos());
             }
-            delete *ant;
+            if ((*ant)->refCount > 0)
+                antsDelList.push_back(*ant);
+            else
+                delete *ant;
             ant = ants.erase(ant);
         }
         else
@@ -386,11 +401,11 @@ void MainGameState::OnFrame()
     }
     for (vector<BaseCannon *>::iterator cannon = cannons.begin(); cannon != cannons.end(); ++cannon)
     {
-        (*cannon)->step();
+        (*cannon)->step(deltaTime);
     }
     for (list<Bullet *>::iterator bullet = bullets.begin(); bullet != bullets.end();)
     {
-        (*bullet)->step();
+        (*bullet)->step(deltaTime);
         if (!(*bullet)->isActive())
         {
             (*bullet)->data->releaseInstance(*bullet);

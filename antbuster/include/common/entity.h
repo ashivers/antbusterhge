@@ -17,9 +17,9 @@ public:
     {
         time;
     }
-    virtual void step()
+    virtual void step(float deltaTime)
     {
-
+        deltaTime;
     }
     bool isActive() const
     {

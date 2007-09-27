@@ -49,8 +49,10 @@ void BaseCannon::render(int time)
     hge->Release();
 }
 
-void BaseCannon::step()
+void BaseCannon::step(float deltaTime)
 {
+    deltaTime;
+
     Ant *ant = MainGameState::GetInstance()->getTargetAnt(this->pos, this->data->range);
     if (ant)
     {
@@ -108,7 +110,26 @@ void MachineGun::fire(const hgeVector &targetPos)
     dir.Rotate(((float) rand() / RAND_MAX - 0.5) * 0.5);
     MainGameState::GetInstance()->fire(this->pos, dir, this->data->getBulletData());
 }
+void MissileLauncher::step(float deltaTime)
+{
+    deltaTime;
 
+    Ant *ant = MainGameState::GetInstance()->getTargetAnt(this->pos, this->data->range);
+    if (ant)
+    {
+        hgeVector tp = ant->getPos();
+        HGE* hge = hgeCreate(HGE_VERSION);
+        float curtime = hge->Timer_GetTime();
+        if ((curtime - lastFireTime) * this->data->freq > 1)
+        {
+            this->targetPos = tp;
+            MainGameState::GetInstance()->fire(this->pos, *ant, this->data->getBulletData());
+            this->lastFireTime = curtime;
+            anim_tower->startAnim(int(curtime * 60));
+        }
+        hge->Release();
+    }
+}
 BaseCannon *BaseCannon::upgrade(size_t index) const
 {
     assert(index < 3);
@@ -194,14 +215,14 @@ CannonData g_cannonData[BaseCannon::NumCannonId] =
     },
     {
         BaseCannon::CI_MissileLauncher1, BaseCannon::CI_HeavyCannon2, {BaseCannon::CI_MissileLauncher2, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
-        "Missile Launcher 1",   3.0f, Bullet::BI_Missile1, 120.0f, 288,
+        "Missile Launcher 1",   0.2f, Bullet::BI_Missile1, 120.0f, 288,
         "data/cannon/base/29", //
         "data/cannon/tower/3", //
         "data/cannon/button/21",
     },
     {
         BaseCannon::CI_MissileLauncher2, BaseCannon::CI_MissileLauncher1, {BaseCannon::CI_NULL, BaseCannon::CI_NULL, BaseCannon::CI_NULL,},
-        "Missile Launcher 2",   3.0f, Bullet::BI_Missile2, 120.0f, 288,
+        "Missile Launcher 2",   0.2f, Bullet::BI_Missile1, 120.0f, 288,
         "data/cannon/base/3", //
         "data/cannon/tower/3", //
         "data/cannon/button/21",
@@ -436,8 +457,6 @@ BaseCannon *CannonData::createInstance(cAni::iAnimResManager &arm) const
     case BaseCannon::CI_HeavyCannon1:
     case BaseCannon::CI_HeavyCannon2:
     case BaseCannon::CI_HeavyCannon3:
-    case BaseCannon::CI_MissileLauncher1:
-    case BaseCannon::CI_MissileLauncher2:
     case BaseCannon::CI_ImpactCannon1:
     case BaseCannon::CI_ImpactCannon2:
     case BaseCannon::CI_IceCannon1:
@@ -477,11 +496,10 @@ BaseCannon *CannonData::createInstance(cAni::iAnimResManager &arm) const
     case BaseCannon::CI_MachineGun:
         cannon = new MachineGun(arm, this);
         break;
-        /* add new cannon like this
-    case BaseCannon::CI_MissleLauncher:
-        cannon = new MissileLauncher;
+    case BaseCannon::CI_MissileLauncher1:
+    case BaseCannon::CI_MissileLauncher2:
+        cannon = new MissileLauncher(arm, this);
         break;
-    */
     default:
         assert(0);
         break;
