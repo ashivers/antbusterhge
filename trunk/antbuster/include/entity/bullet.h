@@ -24,7 +24,7 @@ public:
     Bullet(cAni::iAnimResManager &arm, const BulletData *data);
     virtual ~Bullet();
     virtual void render(int time);
-    virtual void step();
+    virtual void step(float deltaTime);
 
     void setPos(const hgeVector &pos)
     {
@@ -48,7 +48,8 @@ public:
     Missile(cAni::iAnimResManager &arm, const BulletData *data) : Bullet(arm, data), targetAnt(0)
     {
     }
-    virtual void step();
+    ~Missile();
+    virtual void step(float deltaTime);
     virtual void setTarget(Ant &ant);
 
     Ant *targetAnt; //target ant

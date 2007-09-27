@@ -80,9 +80,9 @@ void Map::render(int time)
     hge->Release();
 }
 
-void Map::step()
+void Map::step(float deltaTime)
 {
-
+    deltaTime;
 }
 bool Map::isInMapRange(float x, float y) const
 {

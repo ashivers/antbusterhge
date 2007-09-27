@@ -25,7 +25,7 @@ public:
     Ant(cAni::iAnimResManager &arm);
     virtual ~Ant();
     virtual void render(int time);
-    virtual void step();
+    virtual void step(float deltaTime);
     virtual AimType getAimType() const
     {
         return AT_Ant;

@@ -70,7 +70,7 @@ protected:
 
     HGE *hge;
 
-    list<Ant *> ants;
+    list<Ant *> ants, antsDelList;
     vector<BaseCannon *> cannons;
     list<Bullet *> bullets;
     vector<hgeVector> cakeBack;

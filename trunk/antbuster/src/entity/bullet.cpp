@@ -39,18 +39,19 @@ void Bullet::render(int time)
     hge->Release();
 }
 
-void Bullet::step()
+void Bullet::step(float deltaTime)
 {
     hgeVector dir = target - pos;
     float distance = dir.Length();
-    if (distance < this->data->bulletSpeed)
+    float moveDistance = this->data->bulletSpeed * deltaTime;
+    if (distance < moveDistance)
     {
         active = false;
     }
     else
     {
         dir.Normalize();
-        dir *= this->data->bulletSpeed;
+        dir *= moveDistance;
         pos += dir;
 
         vector<Ant *> hitAnts;
@@ -63,12 +64,20 @@ void Bullet::step()
     }
 }
 
+Missile::~Missile()
+{
+    if (this->targetAnt)
+    {
+        assert(this->targetAnt->refCount > 0);
+        this->targetAnt->refCount--;
+    }
+}
 void Missile::setTarget(Ant &ant)
 {
     ant.refCount++;
     this->targetAnt = &ant;
 }
-void Missile::step()
+void Missile::step(float deltaTime)
 {
     if (targetAnt)
     {
@@ -81,8 +90,12 @@ void Missile::step()
             assert(this->targetAnt->refCount > 0);
             this->targetAnt->refCount--;
             this->targetAnt = 0;
+            hgeVector dir = this->target - this->pos; 
+            dir.Normalize();
+            this->target = dir * 200 + this->pos;
         }
     }
+    Bullet::step(deltaTime);
 }
 
 
@@ -110,10 +123,9 @@ Bullet *BulletData::createInstance(cAni::iAnimResManager &arm) const// Éú³ÉÒ»¸öÐ
     case Bullet::BI_CannonD:
         bullet = new Bullet(arm, this);
         break;
-    /*
-    case Bullet::BI_Missle:
-    bullet = new Missile;
-    */
+    case Bullet::BI_Missile1:
+        bullet = new Missile(arm, this);
+        break;
     default:
         assert(0);
         break;
@@ -144,6 +156,10 @@ void BulletData::applyDamage(Ant &ant) const
         ant.applyDamage(Ant::DT_Normal, damage);
         ant.applyDamage(Ant::DT_Impact, damage);
         break;
+    case Bullet::BI_Missile1:
+        ant.applyDamage(Ant::DT_Normal, damage);
+        ant.applyDamage(Ant::DT_Impact, damage);
+        break;
     default:
         assert(0);
         break;
@@ -151,8 +167,9 @@ void BulletData::applyDamage(Ant &ant) const
 }
 BulletData g_bulletData[Bullet::NumBulletId] =
 {
-    {Bullet::BI_CannonA, "Cannon A", 1.0, 1, "", "data/bullet.xml", "", },
-    {Bullet::BI_CannonB, "Cannon B", 2.0, 2, "data/bullet_fire.xml", "data/bulletb.xml", "data/bullet_explode.xml", },
-    {Bullet::BI_CannonC, "Cannon C", 3.0, 4, "data/bullet_fire.xml", "data/bulletc.xml", "data/bullet_explode.xml", },
-    {Bullet::BI_CannonD, "Cannon D", 4.0, 8, "data/bullet_fire.xml", "data/bulletd.xml", "data/bullet_explode.xml", },
+    {Bullet::BI_CannonA, "Cannon A", 50.0, 1, "", "data/bullet.xml", "", },
+    {Bullet::BI_CannonB, "Cannon B", 60.0, 2, "data/bullet_fire.xml", "data/bulletb.xml", "data/bullet_explode.xml", },
+    {Bullet::BI_CannonC, "Cannon C", 70.0, 4, "data/bullet_fire.xml", "data/bulletc.xml", "data/bullet_explode.xml", },
+    {Bullet::BI_CannonD, "Cannon D", 100.0, 2, "data/bullet_fire.xml", "data/bulletc.xml", "data/bullet_explode.xml", },
+    {Bullet::BI_Missile1, "Missile 1", 30.0, 8, "", "data/bullet.xml", "", },
 };

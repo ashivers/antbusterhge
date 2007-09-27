@@ -40,7 +40,7 @@ public:
     BaseCannon(cAni::iAnimResManager &arm, const CannonData *data);
     virtual ~BaseCannon();
     virtual void render(int time);
-    virtual void step();
+    virtual void step(float deltaTime);
     virtual AimType getAimType() const
     {
         return AT_Cannon;
@@ -93,6 +93,15 @@ public:
     }
 protected:
     virtual void fire(const hgeVector &targetPos);
+};
+class MissileLauncher : public BaseCannon
+{
+public:
+    MissileLauncher(cAni::iAnimResManager &arm, const CannonData *data) : BaseCannon(arm, data)
+    {
+    }
+    virtual void step(float deltaTime);
+protected:
 };
 struct CannonData
 {
