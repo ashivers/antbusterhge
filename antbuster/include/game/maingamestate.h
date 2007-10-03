@@ -59,6 +59,7 @@ public:
         return antLairPos;
     }
 protected:
+    int getCannonPrice() const;
     void addCannon(BaseCannon::CannonId cannonid, float x, float y);
     AimEntity *findAimedEntity(float x, float y) const;
 
@@ -67,6 +68,9 @@ protected:
     void HideCannonUi();
     void ShowAntUi();
     void HideAntUi();
+
+    // 钱发生变化时调用本过程调整当前能使用的升级按钮
+    void UpdateUi();
 
     HGE *hge;
 
