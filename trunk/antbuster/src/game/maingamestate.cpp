@@ -185,13 +185,19 @@ void MainGameState::OnLeave()
 
 void MainGameState::addCannon(BaseCannon::CannonId cannonid, float x, float y)
 {
+    assert(cannonid == BaseCannon::CI_Cannon);
     assert(cannonid >= 0 && cannonid < BaseCannon::NumCannonId);
+    int cannonPrice = getCannonPrice();
+    if (money < cannonPrice)
+        return;
+    money -= cannonPrice;
     BaseCannon *cannon = g_cannonData[cannonid].createInstance(*animResManager);
     cannon->setPos(hgeVector(x, y));
     map->setOccupied(x, y);
     cannons.push_back(cannon);
     assert(aimEntityHead);
     aimEntityHead->insertAfter(*cannon);
+    UpdateUi();
 }
 
 AimEntity *MainGameState::findAimedEntity(float x, float y) const
@@ -296,12 +302,10 @@ void MainGameState::OnFrame()
         map->setShowHighLightClip(true);
         break;
     case GID_BtnPause:
-		if (restCake > 0)
-			restCake--;
+		// if (restCake > 0) restCake--;
         break;
     case GID_BtnMute:
-		if (restCake < 8)
-			restCake++;
+		// if (restCake < 8) restCake++;
         break;
     case GID_BtnCannonUpgradeA:
     case GID_BtnCannonUpgradeB:
@@ -310,15 +314,21 @@ void MainGameState::OnFrame()
             assert(curPick);
             assert(curPick->getAimType() == AimEntity::AT_Cannon);
             BaseCannon *cannon = (BaseCannon *)curPick;
-            BaseCannon *newCannon = cannon->upgrade(id - GID_BtnCannonUpgradeA);
-            if (newCannon)
+            BaseCannon::CannonId nextCannonId = cannon->getData().evolution[id - GID_BtnCannonUpgradeA];
+            if (money >= g_cannonData[nextCannonId].price)
             {
-                replace(this->cannons.begin(), this->cannons.end(), cannon, newCannon);
-                SetPick(newCannon);
-                newCannon->setPos(cannon->getPos());
-                assert(aimEntityHead);
-                aimEntityHead->insertAfter(*newCannon);
-                delete cannon;
+                money -= g_cannonData[nextCannonId].price;
+                BaseCannon *newCannon = cannon->upgrade(id - GID_BtnCannonUpgradeA);
+                if (newCannon)
+                {
+                    replace(this->cannons.begin(), this->cannons.end(), cannon, newCannon);
+                    SetPick(newCannon);
+                    newCannon->setPos(cannon->getPos());
+                    assert(aimEntityHead);
+                    aimEntityHead->insertAfter(*newCannon);
+                    delete cannon;
+                }
+                UpdateUi();
             }
         }
         break;
@@ -327,6 +337,7 @@ void MainGameState::OnFrame()
             assert(curPick);
             assert(curPick->getAimType() == AimEntity::AT_Cannon);
             BaseCannon *cannon = (BaseCannon *)curPick;
+            this->money += cannon->getData().price / 2;
             BaseCannon *newCannon = cannon->degrade();
             if (newCannon)
             {
@@ -343,6 +354,7 @@ void MainGameState::OnFrame()
                 map->clearOccupied(cannon->getPos().x, cannon->getPos().y);
             }
             delete cannon;
+            UpdateUi();
         }
         break;
 
@@ -369,7 +381,7 @@ void MainGameState::OnFrame()
         {
             points += (*ant)->getLevel();
             money += (*ant)->getLevel();
-
+            UpdateUi();
             if (this->curPick == *ant)
             {
                 SetPick(0);
@@ -417,7 +429,7 @@ void MainGameState::OnFrame()
     assert(this->restCake + cakeBack.size() <= 8);
     for (vector<hgeVector>::iterator cake = cakeBack.begin(); cake != cakeBack.end();)
     {
-        *cake = getCakePos() * 0.1 + *cake * 0.9;
+        *cake = getCakePos() * 0.1f + *cake * 0.9f;
         if ((*cake - getCakePos()).Length() < 16)
         {
             cake = cakeBack.erase(cake);
@@ -632,4 +644,47 @@ void MainGameState::getNearestAnts(vector<Ant *> &hitAnts, const hgeVector &pos,
         }
     }
     sort(hitAnts.begin(), hitAnts.end(), CmpNearestFrom(pos));
+}
+
+// 钱发生变化时调用本过程调整当前能使用的升级按钮
+void MainGameState::UpdateUi()
+{
+    gui->EnableCtrl(GID_BtnAddCannon, money >= getCannonPrice());
+    gui->EnableCtrl(GID_BtnCannonUpgradeA, false);
+    gui->EnableCtrl(GID_BtnCannonUpgradeB, false);
+    gui->EnableCtrl(GID_BtnCannonUpgradeC, false);
+    if (this->curPick)
+    {
+        switch(this->curPick->getAimType())
+        {
+        case AimEntity::AT_Ant:
+            break;
+        case AimEntity::AT_Cannon:
+            {
+                BaseCannon *cannon = (BaseCannon *)curPick;
+                for (int i = 0; i < 3; i++)
+                {
+                    BaseCannon::CannonId nextCannonId = cannon->getData().evolution[i];
+                    if (nextCannonId == BaseCannon::CI_NULL)
+                        continue;
+                    if (money >= g_cannonData[nextCannonId].price)
+                    {
+                        gui->EnableCtrl(GID_BtnCannonUpgradeA + i, true);
+                    }
+                }
+            }
+            break;
+        }
+    }
+}
+
+int MainGameState::getCannonPrice() const
+{
+    size_t cannonCount = this->cannons.size();
+    int price = 30;
+    for (size_t i = 0; i < cannonCount; i++)
+    {
+        price = int(price * 1.5f);
+    }
+    return price;
 }
